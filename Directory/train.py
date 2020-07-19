@@ -2,7 +2,7 @@
 #
 #   File name   : train.py
 #   Author      : PyLessons
-#   Created date: 2020-06-03
+#   Created date: 2020-07-15
 #   Website     : https://pylessons.com/
 #   GitHub      : https://github.com/pythonlessons/TensorFlow-2.x-YOLOv3
 #   Description : used to train custom object detector
@@ -18,6 +18,7 @@ from yolov3.dataset import Dataset
 from yolov3.yolov3 import Create_Yolov3, YOLOv3, decode, compute_loss
 from yolov3.utils import load_yolo_weights#, load_tiny_yolo_weights
 from yolov3.configs import *
+from evaluate_mAP import get_mAP
 
 Darknet_weights = YOLO_DARKNET_WEIGHTS
 if TRAIN_YOLO_TINY:
@@ -161,13 +162,20 @@ def main():
               format(giou_val/count, conf_val/count, prob_val/count, total_val/count))
 
         if TRAIN_SAVE_CHECKPOINT and not TRAIN_SAVE_BEST_ONLY:
-            yolo.save_weights(os.path.join(TRAIN_CHECKPOINTS_FOLDER, TRAIN_MODEL_NAME+"_val_loss_{:7.2f}".format(total_val/count)))
+            save_directory = os.path.join(TRAIN_CHECKPOINTS_FOLDER, TRAIN_MODEL_NAME+"_val_loss_{:7.2f}".format(total_val/count))
+            yolo.save_weights(save_directory)
         if TRAIN_SAVE_BEST_ONLY and best_val_loss>total_val/count:
-            yolo.save_weights(os.path.join(TRAIN_CHECKPOINTS_FOLDER, TRAIN_MODEL_NAME))
+            save_directory = os.path.join(TRAIN_CHECKPOINTS_FOLDER, TRAIN_MODEL_NAME)
+            yolo.save_weights(save_directory)
             best_val_loss = total_val/count
         if not TRAIN_SAVE_BEST_ONLY and not TRAIN_SAVE_CHECKPOINT:
-            yolo.save_weights(os.path.join(TRAIN_CHECKPOINTS_FOLDER, TRAIN_MODEL_NAME))
+            save_directory = os.path.join(TRAIN_CHECKPOINTS_FOLDER, TRAIN_MODEL_NAME)
+            yolo.save_weights(save_directory)
 
+    # measure mAP of trained custom model
+    model = Create_Yolov3(input_size=YOLO_INPUT_SIZE, CLASSES=TRAIN_CLASSES)
+    model.load_weights(save_directory) # use keras weights
+    get_mAP(model, testset, score_threshold=TEST_SCORE_THRESHOLD, iou_threshold=TEST_IOU_THRESHOLD)
 
 if __name__ == '__main__':
     main()

@@ -2,7 +2,7 @@
 #
 #   File name   : dataset.py
 #   Author      : PyLessons
-#   Created date: 2020-05-18
+#   Created date: 2020-07-15
 #   Website     : https://pylessons.com/
 #   GitHub      : https://github.com/pythonlessons/TensorFlow-2.x-YOLOv3
 #   Description : functions used to prepare dataset for custom training
@@ -61,14 +61,31 @@ class Dataset(object):
                     break
             if not os.path.exists(image_path):
                 raise KeyError("%s does not exist ... " %image_path)
-            if TRAIN_LOAD_IMAGES_TO_RAM: image_path = cv2.imread(image_path)
-            final_annotations.append([image_path, line[index:]])
-
+            if TRAIN_LOAD_IMAGES_TO_RAM:
+                image = cv2.imread(image_path)
+            else:
+                image = ''
+            final_annotations.append([image_path, line[index:], image])
         return final_annotations
 
     def __iter__(self):
         return self
 
+    def Delete_bad_annotation(self, bad_annotation):
+        print(f'Deleting {bad_annotation} annotation line')
+        bad_image_path = bad_annotation[0]
+        bad_image_name = bad_annotation[0].split('/')[-1] # can be used to delete bad image
+        bad_xml_path = bad_annotation[0][:-3]+'xml' # can be used to delete bad xml file
+
+        # remove bad annotation line from annotation file
+        with open(self.annot_path, "r+") as f:
+            d = f.readlines()
+            f.seek(0)
+            for i in d:
+                if bad_image_name not in i:
+                    f.write(i)
+            f.truncate()
+    
     def __next__(self):
         with tf.device('/cpu:0'):
             self.train_input_size = random.choice([self.train_input_sizes])
@@ -87,6 +104,7 @@ class Dataset(object):
             batch_mbboxes = np.zeros((self.batch_size, self.max_bbox_per_scale, 4), dtype=np.float32)
             batch_lbboxes = np.zeros((self.batch_size, self.max_bbox_per_scale, 4), dtype=np.float32)
 
+            exceptions = False
             num = 0
             if self.batch_count < self.num_batchs:
                 while num < self.batch_size:
@@ -94,7 +112,12 @@ class Dataset(object):
                     if index >= self.num_samples: index -= self.num_samples
                     annotation = self.annotations[index]
                     image, bboxes = self.parse_annotation(annotation)
-                    label_sbbox, label_mbbox, label_lbbox, sbboxes, mbboxes, lbboxes = self.preprocess_true_boxes(bboxes)
+                    try:
+                        label_sbbox, label_mbbox, label_lbbox, sbboxes, mbboxes, lbboxes = self.preprocess_true_boxes(bboxes)
+                    except IndexError:
+                        exceptions = True
+                        self.Delete_bad_annotation(annotation)
+                        print("IndexError, something wrong with", annotation[0], "removed this line from annotation file")
 
                     batch_image[num, :, :, :] = image
                     batch_label_sbbox[num, :, :, :, :] = label_sbbox
@@ -104,6 +127,10 @@ class Dataset(object):
                     batch_mbboxes[num, :, :] = mbboxes
                     batch_lbboxes[num, :, :] = lbboxes
                     num += 1
+
+                if exceptions: 
+                    print('\n')
+                    raise Exception("There were problems with dataset, I fixed them, now restart the training process.")
                 self.batch_count += 1
                 batch_smaller_target = batch_label_sbbox, batch_sbboxes
                 batch_medium_target  = batch_label_mbbox, batch_mbboxes
@@ -166,9 +193,10 @@ class Dataset(object):
 
         return image, bboxes
 
-    def parse_annotation(self, annotation):
+    def parse_annotation(self, annotation, mAP = 'False'):
         if TRAIN_LOAD_IMAGES_TO_RAM:
-            image = annotation[0]
+            image_path = annotation[0]
+            image = annotation[2]
         else:
             image_path = annotation[0]
             image = cv2.imread(image_path)
@@ -180,8 +208,11 @@ class Dataset(object):
             image, bboxes = self.random_crop(np.copy(image), np.copy(bboxes))
             image, bboxes = self.random_translate(np.copy(image), np.copy(bboxes))
 
-        image = cv2.cvtColor(image, cv2.COLOR_BGR2RGB)
-        image, bboxes = image_preprocess(np.copy(image), [self.train_input_size, self.train_input_size], np.copy(bboxes))
+        #image = cv2.cvtColor(image, cv2.COLOR_BGR2RGB)
+        if mAP == True: 
+            return image, bboxes
+        
+        image, bboxes = image_preprocess(np.copy(image), [self.input_sizes, self.input_sizes], np.copy(bboxes))
         return image, bboxes
 
     def preprocess_true_boxes(self, bboxes):
