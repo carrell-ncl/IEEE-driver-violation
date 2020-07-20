@@ -36,7 +36,9 @@ yolo = Create_Yolov3(input_size=input_size, CLASSES=TRAIN_CLASSES)
 #load_yolo_weights(yolo, Darknet_weights) # use Darknet weights
 yolo.load_weights("./checkpoints/yolov3_custom") # use keras weights
 
-def Object_tracking(YoloV3, video_path, output_path, input_size=416, show=False, CLASSES=TRAIN_CLASSES, score_threshold=0.6, iou_threshold=0.45, rectangle_colors='', Track_only = []):
+detection_time_list = [] #Steven - used to store all the detection times 
+
+def Object_tracking(YoloV3, video_path, output_path, input_size=416, show=False, CLASSES=TRAIN_CLASSES, score_threshold=0.3, iou_threshold=0.45, rectangle_colors='', Track_only = []):
     # Definition of the parameters
     max_cosine_distance = 0.7
     nn_budget = None
@@ -49,6 +51,7 @@ def Object_tracking(YoloV3, video_path, output_path, input_size=416, show=False,
 
     times = []
     ID_LIST = [] #Steven - used to output images based on condition
+    
 
     if video_path:
         vid = cv2.VideoCapture(video_path) # detect on video
@@ -78,7 +81,9 @@ def Object_tracking(YoloV3, video_path, output_path, input_size=416, show=False,
         
         t1 = time.time()
         pred_bbox = YoloV3.predict(image_data)
+
         t2 = time.time()
+
 
         times.append(t2-t1)
         times = times[-20:]
@@ -103,10 +108,10 @@ def Object_tracking(YoloV3, video_path, output_path, input_size=416, show=False,
         scores = np.array(scores)
         features = np.array(encoder(original_image, boxes))
         detections = [Detection(bbox, score, class_name, feature) for bbox, score, class_name, feature in zip(boxes, scores, names, features)]
-
         # Pass detections to the deepsort object and obtain the track information.
         tracker.predict()
         tracker.update(detections)
+       
 
         # Obtain info from the tracks
         tracked_bboxes = []
@@ -118,8 +123,10 @@ def Object_tracking(YoloV3, video_path, output_path, input_size=416, show=False,
             class_name = track.get_class() #Get the class name of particular object
             tracking_id = track.track_id # Get the ID for the particular track
             index = key_list[val_list.index(class_name)] # Get predicted object index by object name
-            tracked_bboxes.append(bbox.tolist() + [tracking_id, index]) # Structure data, that we could use it with our draw_bbox function
+            #Added scores to tracked boxes so we can see probability confidence of each detection
+            tracked_bboxes.append(bbox.tolist() + [tracking_id, index, scores]) # Structure data, that we could use it with our draw_bbox function
             ID.append(tracking_id)
+
             
             
         
@@ -140,14 +147,15 @@ def Object_tracking(YoloV3, video_path, output_path, input_size=416, show=False,
     
         for name, id_no in zip(names, ID):
             if id_no not in ID_LIST:
-                print('NEW ONE')
+                detection_time_list.append(time_str)
+                det = 'Detection ' + name + ' ' + str(id_no) + ' at ' + time_str
+                print(det)
+                detection_time_list.append(det)
                 cv2.imwrite('./IMAGES/detections/detection'+str(id_no)+'.jpg', image)
-            print(name + ' ' + str(id_no))
-            ID_LIST.append(id_no)
-            print(ID_LIST)
+                ID_LIST.append(id_no)
+            
 
-        ID_LIST = list(set(ID_LIST)) #To stop the ID_LIST getting unnecessarily  long with duplicated IDs
-        
+
         #****
 
         # draw original yolo detection
@@ -166,4 +174,5 @@ def Object_tracking(YoloV3, video_path, output_path, input_size=416, show=False,
 
 
 #Object_tracking(yolo, video_path, "detection.mp4", input_size=input_size, show=True, iou_threshold=0.1, rectangle_colors=(255,0,0), Track_only = ["person"])
-Object_tracking(yolo, video_path=False, output_path="detection_track.mp4", input_size=input_size, show=True, iou_threshold=0.1, rectangle_colors=(255,0,0))
+Object_tracking(yolo, video_path=False, output_path="detection_track_nofilt.mp4", input_size=input_size, show=True, iou_threshold=0.1, rectangle_colors=(255,0,0), Track_only = ['Phone'])
+

@@ -23,7 +23,7 @@ if TRAIN_YOLO_TINY:
     Darknet_weights = YOLO_DARKNET_TINY_WEIGHTS
 
 image_path   = "./IMAGES/plate_2.jpg"
-video_path   = "./IMAGES/city.mp4"
+video_path   = "./IMAGES/20200719_171845.mp4"
 
 yolo = Create_Yolov3(input_size=input_size, CLASSES=TRAIN_CLASSES)
 yolo.load_weights("./checkpoints/yolov3_custom") # use keras weights

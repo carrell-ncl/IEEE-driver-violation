@@ -127,8 +127,10 @@ def draw_bbox(image, bboxes, CLASSES=YOLO_COCO_CLASSES, show_label=True, show_co
             # get text label
             score_str = " {:.2f}".format(score) if show_confidence else ""
 
-            if tracking: score_str = " "+str(score)
-
+            if tracking: 
+                score_str = " "+str(score)+' ' +str(np.around(bbox[6], 2)) #Steven - add confidence prob to detection
+     
+        
             label = "{}".format(NUM_CLASS[class_ind]) + score_str
 
             # get text size
