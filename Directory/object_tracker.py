@@ -23,6 +23,9 @@ from deep_sort.detection import Detection
 from deep_sort.tracker import Tracker
 from deep_sort import generate_detections as gdet
 from datetime import datetime
+from time import gmtime, strftime  #Steven - added for sceduling the daily writing of detection_time_list to .txt file
+import os.path
+import pandas as pd
 
 input_size = YOLO_INPUT_SIZE
 Darknet_weights = YOLO_DARKNET_WEIGHTS
@@ -30,13 +33,14 @@ if TRAIN_YOLO_TINY:
     Darknet_weights = YOLO_DARKNET_TINY_WEIGHTS
 
 video_path   = "./IMAGES/test.mp4"
+csv_path = './IMAGES/detections/summary/tester.csv' #Steven - set path for master CSV
 
 #yolo = Create_Yolov3(input_size=input_size)
 yolo = Create_Yolov3(input_size=input_size, CLASSES=TRAIN_CLASSES)
 #load_yolo_weights(yolo, Darknet_weights) # use Darknet weights
 yolo.load_weights("./checkpoints/yolov3_custom") # use keras weights
 
-detection_time_list = [] #Steven - used to store all the detection times 
+
 
 def Object_tracking(YoloV3, video_path, output_path, input_size=416, show=False, CLASSES=TRAIN_CLASSES, score_threshold=0.3, iou_threshold=0.45, rectangle_colors='', Track_only = []):
     # Definition of the parameters
@@ -51,6 +55,7 @@ def Object_tracking(YoloV3, video_path, output_path, input_size=416, show=False,
 
     times = []
     ID_LIST = [] #Steven - used to output images based on condition
+    detection_time_list = [] #Steven - used to store all the detection times 
     
 
     if video_path:
@@ -68,6 +73,9 @@ def Object_tracking(YoloV3, video_path, output_path, input_size=416, show=False,
     NUM_CLASS = read_class_names(CLASSES)
     key_list = list(NUM_CLASS.keys()) 
     val_list = list(NUM_CLASS.values())
+    
+    current_time = str(strftime("%H:%M", gmtime()))
+    
     while True:
         _, img = vid.read()
 
@@ -144,18 +152,42 @@ def Object_tracking(YoloV3, video_path, output_path, input_size=416, show=False,
         time_str = now.strftime("%d/%m/%Y %H:%M:%S")
         image = cv2.putText(image, time_str, (1000, 30), cv2.FONT_HERSHEY_COMPLEX_SMALL, 1, (0, 0, 255), 2)
 
-    
+        #Below loop to check if ID has been seen, if not take snapshot and save in directory. ID will then be appended to the list to 
+        #ensure more snapshots of the same ID are not saved.
         for name, id_no in zip(names, ID):
             if id_no not in ID_LIST:
-                detection_time_list.append(time_str)
                 det = 'Detection ' + name + ' ' + str(id_no) + ' at ' + time_str
-                print(det)
-                detection_time_list.append(det)
+                print(det)               
                 cv2.imwrite('./IMAGES/detections/detection'+str(id_no)+'.jpg', image)
+                detection_time_list.append(det + ' Image location: ' + './IMAGES/detections/detection'+str(id_no)+'.jpg')
                 ID_LIST.append(id_no)
             
 
-
+        #Below code will write and save .txt file every 24 hours to show the daily detections which includes class, ID, time and also output 
+        #file name. Daily detections added to the master CSV for futher analysis.
+        new_time = str(strftime("%H:%M", gmtime()))
+        if new_time != current_time:
+            
+            no_detections = len(detection_time_list)
+            detection_time_list.append('NUMBER OF DETECTIONS TODAY: ' + str(no_detections))
+            with open("./IMAGES/detections/" + current_time +".txt", "w") as output:
+                for row in detection_time_list:
+                    output.write(str(row) + '\n')
+            print('Saved new')
+            detection_time_list = []
+            
+            if os.path.exists(csv_path):
+                day_df = pd.DataFrame({"Date":[current_time], 
+                             "Detections":[no_detections]}) 
+                master_csv = pd.read_csv('./IMAGES/detections/summary/tester.csv')
+                
+                master_csv = master_csv.append(day_df)
+                master_csv.to_csv('./IMAGES/detections/summary/tester.csv', encoding='utf-8', index=False)
+            else:
+                master_csv = pd.DataFrame({"Date":[current_time], 
+                         "Detections":[no_detections]}) 
+                master_csv.to_csv('./IMAGES/detections/summary/tester.csv', encoding='utf-8', index=False)
+            current_time = new_time
         #****
 
         # draw original yolo detection
@@ -169,7 +201,7 @@ def Object_tracking(YoloV3, video_path, output_path, input_size=416, show=False,
             if cv2.waitKey(25) & 0xFF == ord("q"):
                 cv2.destroyAllWindows()
                 break
-            
+    print(current_time)      
     cv2.destroyAllWindows()
 
 
