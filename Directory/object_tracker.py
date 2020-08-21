@@ -29,19 +29,18 @@ import os.path
 import pandas as pd
 
 
-
 input_size = YOLO_INPUT_SIZE
 Darknet_weights = YOLO_DARKNET_WEIGHTS
 if TRAIN_YOLO_TINY:
     Darknet_weights = YOLO_DARKNET_TINY_WEIGHTS
 
-video_path   = "./IMAGES/test.mp4"
+video_path   = "./IMAGES/traffic1.mp4"
 csv_path = './IMAGES/detections/summary/tester.csv' #Steven - set path for master CSV
 
 #yolo = Create_Yolov3(input_size=input_size)
 yolo = Create_Yolov3(input_size=input_size, CLASSES=TRAIN_CLASSES)
 #load_yolo_weights(yolo, Darknet_weights) # use Darknet weights
-yolo.load_weights("./checkpoints/yolov3_custom") # use keras weights
+yolo.load_weights("./checkpoints/yolov3_custom_SB_P") # use keras weights
 
 
 
@@ -63,6 +62,7 @@ def Object_tracking(YoloV3, video_path, output_path, input_size=416, show=False,
 
     if video_path:
         vid = cv2.VideoCapture(video_path) # detect on video
+       
     else:
         vid = cv2.VideoCapture(0) # detect from webcam
 
@@ -77,13 +77,14 @@ def Object_tracking(YoloV3, video_path, output_path, input_size=416, show=False,
     key_list = list(NUM_CLASS.keys()) 
     val_list = list(NUM_CLASS.values())
     
+    current_day = datetime.today().strftime('%d/%m/%Y')
     current_time = str(strftime("%H:%M", gmtime()))
-    current_hour = str(strftime("%H", gmtime()))
+    current_hour = str(strftime("%H%p", gmtime()))
     det_counter = 0
     
     while True:
         _, img = vid.read()
-
+        
         try:
             original_image = cv2.cvtColor(img, cv2.COLOR_BGR2RGB)
             original_image = cv2.cvtColor(original_image, cv2.COLOR_BGR2RGB)
@@ -124,7 +125,7 @@ def Object_tracking(YoloV3, video_path, output_path, input_size=416, show=False,
         # Pass detections to the deepsort object and obtain the track information.
         tracker.predict()
         tracker.update(detections)
-       
+        
 
         # Obtain info from the tracks
         tracked_bboxes = []
@@ -152,7 +153,8 @@ def Object_tracking(YoloV3, video_path, output_path, input_size=416, show=False,
         image = cv2.putText(image, "FPS: {:.1f}".format(fps), (0, 30), cv2.FONT_HERSHEY_COMPLEX_SMALL, 1, (0, 0, 255), 2)
         
         #****Steven - add date and time to image
-        today = date.today()
+        #today = date.today()
+        new_day = datetime.today().strftime('%d/%m/%Y')
         now = datetime.now()
         time_str = now.strftime("%d/%m/%Y %H:%M:%S")
         image = cv2.putText(image, time_str, (1000, 30), cv2.FONT_HERSHEY_COMPLEX_SMALL, 1, (0, 0, 255), 2)
@@ -160,6 +162,7 @@ def Object_tracking(YoloV3, video_path, output_path, input_size=416, show=False,
         #Below loop to check if ID has been seen, if not take snapshot and save in directory. ID will then be appended to the list to 
         #ensure more snapshots of the same ID are not saved.
         
+
         new_hour = str(strftime("%H", gmtime()))
         for name, id_no in zip(names, ID):
             if id_no not in ID_LIST:
@@ -170,30 +173,36 @@ def Object_tracking(YoloV3, video_path, output_path, input_size=416, show=False,
                 ID_LIST.append(id_no)
                 det_counter+=1
                 print(det_counter)
-                
+        
         if new_hour != current_hour:
             if os.path.exists(csv_path):
-                day_df = pd.DataFrame({"Date":[str(today)], "Hour":[current_hour], 
+                day_df = pd.DataFrame({"Date":[current_day], "Hour":[current_hour[0:2]], 
                  "Detections":[det_counter]}) 
                 master_csv = pd.read_csv('./IMAGES/detections/summary/tester.csv')
             
                 master_csv = master_csv.append(day_df)
                 master_csv.to_csv('./IMAGES/detections/summary/tester.csv', encoding='utf-8', index=False)
             else:
-                master_csv = pd.DataFrame({"Date":[str(today)], "Hour":[current_hour], 
+                master_csv = pd.DataFrame({"Date":[current_day], "Hour":[current_hour[0:2]], 
                  "Detections":[det_counter]}) 
                 master_csv.to_csv('./IMAGES/detections/summary/tester.csv', encoding='utf-8', index=False)
             current_hour = new_hour
-            
+        
+        
 
         #Below code will write and save .txt file every 24 hours to show the daily detections which includes class, ID, time and also output 
         #file name. Daily detections added to the master CSV for futher analysis.
         new_time = str(strftime("%H:%M", gmtime()))
+        
+        format_today = new_day.replace('/', '')
+#Changed to write each minute for the purpose of testing code. Need to remove 'str(current_time) and also change to
+#'if new_date != current date'
+        #if new_day != current_day
         if new_time != current_time:
-            
             no_detections = len(detection_time_list)
             detection_time_list.append('NUMBER OF DETECTIONS TODAY: ' + str(no_detections))
-            with open("./IMAGES/detections/" + current_time +".txt", "w") as output:
+
+            with open("./IMAGES/detections/" + format_today + '_Hour_' + str(current_time[0:2]) + ".txt", "w") as output:
                 for row in detection_time_list:
                     output.write(str(row) + '\n')
             print('Saved new')
@@ -213,11 +222,11 @@ def Object_tracking(YoloV3, video_path, output_path, input_size=416, show=False,
             if cv2.waitKey(25) & 0xFF == ord("q"):
                 cv2.destroyAllWindows()
                 break
-    print(current_time)      
+      
     cv2.destroyAllWindows()
 
 
-#Object_tracking(yolo, video_path, "detection.mp4", input_size=input_size, show=True, iou_threshold=0.1, rectangle_colors=(255,0,0), Track_only = ["person"])
-Object_tracking(yolo, video_path=False, output_path="detection_track_nofilt.mp4", input_size=input_size, show=True, iou_threshold=0.1, rectangle_colors=(255,0,0), Track_only = ['Phone'])
+Object_tracking(yolo, video_path, "detection.mp4", input_size=input_size, show=True, iou_threshold=0.1, rectangle_colors=(255,0,0), Track_only = [])
+#Object_tracking(yolo, video_path=False, output_path="detection_track_nofilt.mp4", input_size=input_size, show=True, iou_threshold=0.1, rectangle_colors=(255,0,0), Track_only = ['Phone'])
 
 

@@ -122,6 +122,7 @@ def draw_bbox(image, bboxes, CLASSES=YOLO_COCO_CLASSES, show_label=True, show_co
 
         # put object rectangle
         cv2.rectangle(image, (x1, y1), (x2, y2), bbox_color, bbox_thick*2)
+        #print(x1,y1,x2,y2)
 
         if show_label:
             # get text label
@@ -274,7 +275,7 @@ def detect_image(YoloV3, image_path, output_path, input_size=416, show=False, CL
         
     return image
 
-def detect_video(YoloV3, video_path, output_path, input_size=416, show=False, CLASSES=YOLO_COCO_CLASSES, score_threshold=0.3, iou_threshold=0.45, rectangle_colors=''):
+def detect_video(YoloV3, video_path, output_path, input_size=416, show=False, CLASSES=YOLO_COCO_CLASSES, score_threshold=0.5, iou_threshold=0.45, rectangle_colors=''):
     times = []
     vid = cv2.VideoCapture(video_path)
 

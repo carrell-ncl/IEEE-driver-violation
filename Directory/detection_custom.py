@@ -22,12 +22,25 @@ Darknet_weights = YOLO_DARKNET_WEIGHTS
 if TRAIN_YOLO_TINY:
     Darknet_weights = YOLO_DARKNET_TINY_WEIGHTS
 
-image_path   = "./IMAGES/plate_2.jpg"
-video_path   = "./IMAGES/20200719_171845.mp4"
+image_path   = "./IMAGES/plate8.jpg"
+video_path   = "./IMAGES/traffic1.mp4"
 
 yolo = Create_Yolov3(input_size=input_size, CLASSES=TRAIN_CLASSES)
-yolo.load_weights("./checkpoints/yolov3_custom") # use keras weights
+yolo.load_weights("./checkpoints/yolov3_custom_SB_P") # use keras weights
 
-#detect_image(yolo, image_path, "./IMAGES/plate_1_detect.jpg", input_size=input_size, show=True, CLASSES=TRAIN_CLASSES, rectangle_colors=(255,0,0))
-#detect_video(yolo, video_path, './IMAGES/detected.mp4', input_size=input_size, show=False, CLASSES=TRAIN_CLASSES, rectangle_colors=(255,0,0))
-detect_realtime(yolo, '', input_size=input_size, show=True, CLASSES=TRAIN_CLASSES, rectangle_colors=(255, 0, 0))
+#detect_image(yolo, image_path, "./IMAGES/det1.jpg", input_size=input_size, show=True, CLASSES=TRAIN_CLASSES, rectangle_colors=(255,0,0))
+detect_video(yolo, video_path, './IMAGES/detected.mp4', input_size=input_size, show=True, CLASSES=TRAIN_CLASSES, rectangle_colors=(255,0,0))
+#detect_realtime(yolo, '', input_size=input_size, show=True, CLASSES=TRAIN_CLASSES, rectangle_colors=(255, 0, 0))
+
+
+gpus = tf.config.experimental.list_physical_devices('GPU')
+gpus
+len(gpus)
+
+print('GPU is AVAILABLE' if tf.test.is_gpu_available() else 'NOT AVAILABLE')
+
+
+print(tf.test.is_built_with_cuda()) 
+print(tf.config.list_physical_devices('GPU'))
+
+
