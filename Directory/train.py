@@ -26,6 +26,8 @@ if TRAIN_YOLO_TINY:
     TRAIN_MODEL_NAME = TRAIN_MODEL_NAME+"_Tiny"
     Darknet_weights = YOLO_DARKNET_TINY_WEIGHTS
 
+start_time = str(strftime("%H:%M", gmtime()))
+
 def main():
     global TRAIN_FROM_CHECKPOINT
     
@@ -175,4 +177,5 @@ if __name__ == '__main__':
     main()
 
 current_time = str(strftime("%H:%M", gmtime()))
-print(current_time + 'plus 1 hr')
+print(start_time + ' plus 1 hr')
+print(current_time + ' plus 1 hr')

@@ -34,17 +34,19 @@ Darknet_weights = YOLO_DARKNET_WEIGHTS
 if TRAIN_YOLO_TINY:
     Darknet_weights = YOLO_DARKNET_TINY_WEIGHTS
 
-video_path   = "./IMAGES/traffic1.mp4"
+#video_path   = "./IMAGES/test4.mp4"
+video_path = './IMAGES/to_train/as_frames/new_frames/street8.mp4'
+#video_path = './IMAGES/to_train/jai2.mp4'
 csv_path = './IMAGES/detections/summary/tester.csv' #Steven - set path for master CSV
 
 #yolo = Create_Yolov3(input_size=input_size)
 yolo = Create_Yolov3(input_size=input_size, CLASSES=TRAIN_CLASSES)
 #load_yolo_weights(yolo, Darknet_weights) # use Darknet weights
-yolo.load_weights("./checkpoints/yolov3_custom_SB_P") # use keras weights
+yolo.load_weights("./checkpoints/yolov3_custom_Phone_Plate") # use keras weights
 
 
 
-def Object_tracking(YoloV3, video_path, output_path, input_size=416, show=False, CLASSES=TRAIN_CLASSES, score_threshold=0.3, iou_threshold=0.45, rectangle_colors='', Track_only = []):
+def Object_tracking(YoloV3, video_path, output_path, input_size=416, show=False, CLASSES=TRAIN_CLASSES, score_threshold=0.4, iou_threshold=0.45, rectangle_colors='', Track_only = []):
     # Definition of the parameters
     max_cosine_distance = 0.7
     nn_budget = None
@@ -80,7 +82,8 @@ def Object_tracking(YoloV3, video_path, output_path, input_size=416, show=False,
     current_day = datetime.today().strftime('%d/%m/%Y')
     current_time = str(strftime("%H:%M", gmtime()))
     current_hour = str(strftime("%H%p", gmtime()))
-    det_counter = 0
+    phone_det_counter = 0
+    plate_det_counter = 0
     
     while True:
         _, img = vid.read()
@@ -137,17 +140,19 @@ def Object_tracking(YoloV3, video_path, output_path, input_size=416, show=False,
             class_name = track.get_class() #Get the class name of particular object
             tracking_id = track.track_id # Get the ID for the particular track
             index = key_list[val_list.index(class_name)] # Get predicted object index by object name
-            #Added scores to tracked boxes so we can see probability confidence of each detection
+            #Steven - Added scores to tracked boxes so we can see probability confidence of each detection
+
             tracked_bboxes.append(bbox.tolist() + [tracking_id, index, scores]) # Structure data, that we could use it with our draw_bbox function
             ID.append(tracking_id)
-
+            
             
             
         
         ms = sum(times)/len(times)*1000
         fps = 1000 / ms
     
-
+       
+            
         # draw detection on frame
         image = draw_bbox(original_image, tracked_bboxes, CLASSES=CLASSES, tracking=True)
         image = cv2.putText(image, "FPS: {:.1f}".format(fps), (0, 30), cv2.FONT_HERSHEY_COMPLEX_SMALL, 1, (0, 0, 255), 2)
@@ -164,28 +169,36 @@ def Object_tracking(YoloV3, video_path, output_path, input_size=416, show=False,
         
 
         new_hour = str(strftime("%H", gmtime()))
-        for name, id_no in zip(names, ID):
+        for id_no in ID:
             if id_no not in ID_LIST:
-                det = 'Detection ' + name + ' ' + str(id_no) + ' at ' + time_str
+                det = 'Detection ' + class_name + ' ' + str(id_no) + ' at ' + time_str
                 print(det)               
                 cv2.imwrite('./IMAGES/detections/detection'+str(id_no)+'.jpg', image)
                 detection_time_list.append(det + ' Image location: ' + './IMAGES/detections/detection'+str(id_no)+'.jpg')
                 ID_LIST.append(id_no)
-                det_counter+=1
-                print(det_counter)
-        
+                print(class_name)
+                if class_name == 'Phone':
+                    phone_det_counter+=1
+                    print('Phone count ' + str(phone_det_counter))
+                else:
+                    plate_det_counter+=1
+                    print('Vehicle count ' + str(plate_det_counter))
+                
+        ##TO DO!!! Sort out the double appended hours whenever you re-fun program
         if new_hour != current_hour:
             if os.path.exists(csv_path):
-                day_df = pd.DataFrame({"Date":[current_day], "Hour":[current_hour[0:2]], 
-                 "Detections":[det_counter]}) 
+                day_df = pd.DataFrame({"Date   ":[current_day], "Hour":[current_hour[0:2]], 
+                 "Phone Detections":[phone_det_counter], "Vehicle Detections":[plate_det_counter]}) 
                 master_csv = pd.read_csv('./IMAGES/detections/summary/tester.csv')
             
                 master_csv = master_csv.append(day_df)
                 master_csv.to_csv('./IMAGES/detections/summary/tester.csv', encoding='utf-8', index=False)
             else:
-                master_csv = pd.DataFrame({"Date":[current_day], "Hour":[current_hour[0:2]], 
-                 "Detections":[det_counter]}) 
+                master_csv = pd.DataFrame({"Date   ":[current_day], "Hour":[current_hour[0:2]], 
+                 "Phone Detections":[phone_det_counter], "Vehicle Detections":[plate_det_counter]}) 
                 master_csv.to_csv('./IMAGES/detections/summary/tester.csv', encoding='utf-8', index=False)
+            phone_det_counter = 0
+            plate_det_counter = 0
             current_hour = new_hour
         
         
@@ -226,7 +239,7 @@ def Object_tracking(YoloV3, video_path, output_path, input_size=416, show=False,
     cv2.destroyAllWindows()
 
 
-Object_tracking(yolo, video_path, "detection.mp4", input_size=input_size, show=True, iou_threshold=0.1, rectangle_colors=(255,0,0), Track_only = [])
-#Object_tracking(yolo, video_path=False, output_path="detection_track_nofilt.mp4", input_size=input_size, show=True, iou_threshold=0.1, rectangle_colors=(255,0,0), Track_only = ['Phone'])
+Object_tracking(yolo, video_path, "./IMAGES/detection.mp4", input_size=input_size, show=True, iou_threshold=0.1, rectangle_colors=(255,0,0), Track_only = [])
+#Object_tracking(yolo, video_path=False, output_path="", input_size=input_size, show=True, iou_threshold=0.1, rectangle_colors=(255,0,0), Track_only = [])
 
 

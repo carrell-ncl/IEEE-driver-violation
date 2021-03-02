@@ -6,19 +6,29 @@ Created on Sat Aug 15 09:22:12 2020
 """
 
 import cv2
-import os
+import imutils
+
 
 vid = cv2.VideoCapture('./IMAGES/lightson2.asf')
-im = cv2.imread('./IMAGES/yoda.jpg')
-cv2.imshow('img',im)
+vid2 = cv2.VideoCapture('rtsp://administrator:pass1@169.254.101.136/defaultPrimary?streamType=m')
+x1,y1,x2,y2 = 597, 542, 1017, 672
 
+#im = cv2.imread('./IMAGES/yoda.jpg')
+#cv2.imshow('img',im)
+count = 0
 while True:
-    ret, frame = vid.read()
+    ret, frame = vid2.read()
     if ret == True:
+        frame = imutils.resize(frame, width=1600)
+       # crop_img = frame[y1:y2, x1:x2]
         cv2.imshow('Frame', frame)
+        #cv2.imshow('Frame2', crop_img)
+        count +=1
         
         if cv2.waitKey(25) & 0xFF == ord('q'):
             break
+        
+        
 
         
 
@@ -26,36 +36,3 @@ cv2.waitKey(0)
 cv2.destroyAllWindows()
 
 
-with open("./IMAGES/detections/tester2.txt", "w") as output:
-    output.write('HI2')
-    
-pm = ['13','14','15','16']
-am = ['9','10','11','12']
-
-num = '13:30'
-
-num = str(num[0:2])
-
-if num in pm:
-    print('PM')
-else:
-    print('AM')
-    
-from time import gmtime, strftime
-from datetime import datetime, date 
-today = date.today()
-print(today)
-datetime.strptime(str(today), "%Y/%m/%d").strftime("%d-%m-%Y")
-today = datetime.today().strftime('%d/%m/%Y')
-today
-day = today.strftime('%x')
-day
-current_time = str(strftime("%H:%M%p", gmtime()))
-current_time[5:7]
-type(day)
-d = '15/08/2020'
-d==today
-d.replace('/', '')
-
-import tensorflow as tf
-print("Num GPUs Available: ", len(tf.config.experimental.list_physical_devices('GPU')))

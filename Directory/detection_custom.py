@@ -22,14 +22,15 @@ Darknet_weights = YOLO_DARKNET_WEIGHTS
 if TRAIN_YOLO_TINY:
     Darknet_weights = YOLO_DARKNET_TINY_WEIGHTS
 
-image_path   = "./IMAGES/plate8.jpg"
-video_path   = "./IMAGES/traffic1.mp4"
+image_path   = "./IMAGES/plate7.jpg"
+#video_path   = "./IMAGES/lightson2.asf"
+video_path = 'C:/Users/Steve/Documents/Bandicut/avigilon.avi'
 
 yolo = Create_Yolov3(input_size=input_size, CLASSES=TRAIN_CLASSES)
-yolo.load_weights("./checkpoints/yolov3_custom_SB_P") # use keras weights
+yolo.load_weights("./checkpoints/yolov3_custom_Phone_Plate") # use keras weights
 
-#detect_image(yolo, image_path, "./IMAGES/det1.jpg", input_size=input_size, show=True, CLASSES=TRAIN_CLASSES, rectangle_colors=(255,0,0))
-detect_video(yolo, video_path, './IMAGES/detected.mp4', input_size=input_size, show=True, CLASSES=TRAIN_CLASSES, rectangle_colors=(255,0,0))
+detect_image(yolo, image_path, "./IMAGES/det1.jpg", input_size=input_size, show=True, CLASSES=TRAIN_CLASSES, rectangle_colors=(255,0,0))
+#detect_video(yolo, video_path, './IMAGES/detected.mp4', input_size=input_size, show=True, CLASSES=TRAIN_CLASSES, rectangle_colors=(255,0,0))
 #detect_realtime(yolo, '', input_size=input_size, show=True, CLASSES=TRAIN_CLASSES, rectangle_colors=(255, 0, 0))
 
 
