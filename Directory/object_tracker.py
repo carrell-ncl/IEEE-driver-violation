@@ -29,13 +29,17 @@ import os.path
 import pandas as pd
 
 
+#Set our working directory
+os.chdir(r'C:\Users\Steve\Desktop\deeplearning/directory')
+os.getcwd()
+
 input_size = YOLO_INPUT_SIZE
 Darknet_weights = YOLO_DARKNET_WEIGHTS
 if TRAIN_YOLO_TINY:
     Darknet_weights = YOLO_DARKNET_TINY_WEIGHTS
 
 #video_path   = "./IMAGES/test4.mp4"
-video_path = './IMAGES/to_train/as_frames/new_frames/street8.mp4'
+video_path = './IMAGES/to_train/as_frames/new_frames/street6.avi'
 #video_path = './IMAGES/to_train/jai2.mp4'
 csv_path = './IMAGES/detections/summary/tester.csv' #Steven - set path for master CSV
 

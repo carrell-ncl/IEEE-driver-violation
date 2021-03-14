@@ -9,6 +9,10 @@
 #
 #================================================================
 import os
+#Set our working directory (TEMP)
+os.chdir(r'C:\Users\Steve\Desktop\deeplearning/directory')
+os.getcwd()
+
 os.environ['CUDA_VISIBLE_DEVICES'] = '0'
 import shutil
 import numpy as np
@@ -21,6 +25,8 @@ from yolov3.configs import *
 from datetime import datetime, date 
 from time import gmtime, strftime
 
+
+
 Darknet_weights = YOLO_DARKNET_WEIGHTS
 if TRAIN_YOLO_TINY:
     TRAIN_MODEL_NAME = TRAIN_MODEL_NAME+"_Tiny"
@@ -28,6 +34,7 @@ if TRAIN_YOLO_TINY:
 
 start_time = str(strftime("%H:%M", gmtime()))
 
+val_loss = []
 def main():
     global TRAIN_FROM_CHECKPOINT
     
@@ -161,8 +168,10 @@ def main():
             tf.summary.scalar("validate_loss/prob_val", prob_val/count, step=epoch)
         validate_writer.flush()
             
-        print("\n\ngiou_val_loss:{:7.2f}, conf_val_loss:{:7.2f}, prob_val_loss:{:7.2f}, total_val_loss:{:7.2f}\n\n".
-              format(giou_val/count, conf_val/count, prob_val/count, total_val/count))
+        v_loss = "\n\ngiou_val_loss:{:7.2f}, conf_val_loss:{:7.2f}, prob_val_loss:{:7.2f}, total_val_loss:{:7.2f}\n\n".format(giou_val/count, conf_val/count, prob_val/count, total_val/count) 
+        val_loss.append(v_loss) # Append vall loss of each epoch for analysis
+        #print("\n\ngiou_val_loss:{:7.2f}, conf_val_loss:{:7.2f}, prob_val_loss:{:7.2f}, total_val_loss:{:7.2f}\n\n".
+              #format(giou_val/count, conf_val/count, prob_val/count, total_val/count))
 
         if TRAIN_SAVE_CHECKPOINT and not TRAIN_SAVE_BEST_ONLY:
             yolo.save_weights(os.path.join(TRAIN_CHECKPOINTS_FOLDER, TRAIN_MODEL_NAME+"_val_loss_{:7.2f}".format(total_val/count)))
@@ -179,3 +188,4 @@ if __name__ == '__main__':
 current_time = str(strftime("%H:%M", gmtime()))
 print(start_time + ' plus 1 hr')
 print(current_time + ' plus 1 hr')
+val_loss
