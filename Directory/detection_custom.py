@@ -22,7 +22,9 @@ Darknet_weights = YOLO_DARKNET_WEIGHTS
 if TRAIN_YOLO_TINY:
     Darknet_weights = YOLO_DARKNET_TINY_WEIGHTS
 
-image_path   = "./IMAGES/plate7.jpg"
+
+img_path = 'C:\\Users\\Steve\\Desktop\\deeplearning\\directory\\OIDv4_ToolKit-master\\OID\\Dataset/test\\Phone/mar1.JPG'
+image_path   = "./IMAGES/test_phone1.jpg"
 #video_path   = "./IMAGES/lightson2.asf"
 video_path = 'C:/Users/Steve/Documents/Bandicut/avigilon.avi'
 
@@ -34,14 +36,16 @@ detect_image(yolo, image_path, "./IMAGES/det1.jpg", input_size=input_size, show=
 #detect_realtime(yolo, '', input_size=input_size, show=True, CLASSES=TRAIN_CLASSES, rectangle_colors=(255, 0, 0))
 
 
-gpus = tf.config.experimental.list_physical_devices('GPU')
-gpus
-len(gpus)
-
-print('GPU is AVAILABLE' if tf.test.is_gpu_available() else 'NOT AVAILABLE')
-
-
-print(tf.test.is_built_with_cuda()) 
-print(tf.config.list_physical_devices('GPU'))
+# =============================================================================
+# gpus = tf.config.experimental.list_physical_devices('GPU')
+# gpus
+# len(gpus)
+# 
+# print('GPU is AVAILABLE' if tf.test.is_gpu_available() else 'NOT AVAILABLE')
+# 
+# 
+# print(tf.test.is_built_with_cuda()) 
+# print(tf.config.list_physical_devices('GPU'))
+# =============================================================================
 
 

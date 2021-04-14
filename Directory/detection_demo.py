@@ -10,6 +10,10 @@
 #================================================================
 import os
 os.environ['CUDA_VISIBLE_DEVICES'] = '0'
+
+#Set our working directory
+os.chdir(r'C:\Users\Steve\Desktop\deeplearning/directory')
+os.getcwd()
 import cv2
 import numpy as np
 import tensorflow as tf
@@ -22,12 +26,13 @@ Darknet_weights = YOLO_DARKNET_WEIGHTS
 if TRAIN_YOLO_TINY:
     Darknet_weights = YOLO_DARKNET_TINY_WEIGHTS
 
-image_path   = "./IMAGES/kite.jpg"
-video_path   = "./IMAGES/street_drive.mp4"
+
+image_path   = "./IMAGES/850nm.jpg"
+video_path   = "./IMAGES/test.mp4"
 
 yolo = Create_Yolov3(input_size=input_size)
 load_yolo_weights(yolo, Darknet_weights) # use Darknet weights
 
-detect_image(yolo, image_path, '', input_size=input_size, show=True, rectangle_colors=(255,0,0))
+detect_image(yolo, img_path, '', input_size=input_size, show=True, rectangle_colors=(255,0,0))
 #detect_video(yolo, video_path, '', input_size=input_size, show=True, rectangle_colors=(255,0,0))
 #detect_realtime(yolo, '', input_size=input_size, show=True, rectangle_colors=(255, 0, 0))

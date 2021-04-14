@@ -1,5 +1,6 @@
-
 .DS_Store
+*.mp4
+Directory/.gitignore.txt
 Directory/checkpoints
 Directory/IMAGES
 Directory/log

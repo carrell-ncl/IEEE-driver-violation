@@ -31,7 +31,7 @@ TRAIN_LOGDIR                = "log"
 TRAIN_CHECKPOINTS_FOLDER    = "checkpoints"
 TRAIN_MODEL_NAME            = "yolov3_custom_Phone_Plate"
 TRAIN_LOAD_IMAGES_TO_RAM    = True # faster training, but need more RAM
-TRAIN_BATCH_SIZE            = 12
+TRAIN_BATCH_SIZE            = 8
 TRAIN_INPUT_SIZE            = 416
 TRAIN_DATA_AUG              = True
 TRAIN_TRANSFER              = True
@@ -39,13 +39,13 @@ TRAIN_FROM_CHECKPOINT       = False # "checkpoints/yolov3_custom"
 TRAIN_LR_INIT               = 1e-4
 TRAIN_LR_END                = 1e-6
 TRAIN_WARMUP_EPOCHS         = 2
-TRAIN_EPOCHS                = 70
+TRAIN_EPOCHS                = 5
 
 # TEST options
 TEST_ANNOT_PATH             = "model_data/dataset_test.txt"
 TEST_BATCH_SIZE             = 4
 TEST_INPUT_SIZE             = 416
-TEST_DATA_AUG               = False
+TEST_DATA_AUG               = True
 TEST_DECTECTED_IMAGE_PATH   = ""
 TEST_SCORE_THRESHOLD        = 0.3
 TEST_IOU_THRESHOLD          = 0.45

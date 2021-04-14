@@ -253,7 +253,7 @@ def postprocess_boxes(pred_bbox, original_image, input_size, score_threshold):
     return np.concatenate([coors, scores[:, np.newaxis], classes[:, np.newaxis]], axis=-1)
 
 
-def detect_image(YoloV3, image_path, output_path, input_size=416, show=False, CLASSES=YOLO_COCO_CLASSES, score_threshold=0.5, iou_threshold=0.45, rectangle_colors=''):
+def detect_image(YoloV3, image_path, output_path, input_size=416, show=False, CLASSES=YOLO_COCO_CLASSES, score_threshold=0.4, iou_threshold=0.45, rectangle_colors=''):
     original_image      = cv2.imread(image_path)
     original_image      = cv2.cvtColor(original_image, cv2.COLOR_BGR2RGB)
     original_image      = cv2.cvtColor(original_image, cv2.COLOR_BGR2RGB)
@@ -268,6 +268,7 @@ def detect_image(YoloV3, image_path, output_path, input_size=416, show=False, CL
     bboxes = postprocess_boxes(pred_bbox, original_image, input_size, score_threshold)
     bboxes = nms(bboxes, iou_threshold, method='nms')
 
+
     image = draw_bbox(original_image, bboxes, CLASSES=CLASSES, rectangle_colors=rectangle_colors)
 
     if output_path != '': cv2.imwrite(output_path, image)
@@ -280,6 +281,7 @@ def detect_image(YoloV3, image_path, output_path, input_size=416, show=False, CL
         cv2.destroyAllWindows()
         
     return image
+
 
 def detect_video(YoloV3, video_path, output_path, input_size=416, show=False, CLASSES=YOLO_COCO_CLASSES, score_threshold=0.5, iou_threshold=0.45, rectangle_colors=''):
     times = []
@@ -387,3 +389,5 @@ def detect_realtime(YoloV3, output_path, input_size=416, show=False, CLASSES=YOL
                 break
 
     cv2.destroyAllWindows()
+
+
