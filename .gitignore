@@ -5,6 +5,7 @@ Directory/checkpoints
 Directory/IMAGES
 Directory/log
 Directory/model_data
+Directory/mAP
 Directory/yolov3/__pycache__
 Directory/OIDv4_ToolKit-master/OID
 Directory/OIDv4_ToolKit-master/modules/__pycache__
