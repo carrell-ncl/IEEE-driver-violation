@@ -6,6 +6,7 @@ YOLOv3 implementation in TensorFlow 2.2.0, with support for training, transfer t
 wget -P model_data https://pjreddie.com/media/files/yolov3.weights
 
 File structure should be arranged like this:
+'''bash
 ─Directory
     ├───checkpoints
     ├───deep_sort
@@ -39,6 +40,7 @@ File structure should be arranged like this:
     ├───tools
     └───yolov3
         └───__pycache__
+'''
 
 python train.py
 tensorboard --logdir=log
