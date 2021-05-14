@@ -1,39 +1,45 @@
 # TensorFlow-2.x-YOLOv3 tutorial
 
-YOLOv3 implementation in TensorFlow 2.x, with support for training, transfer training.
+YOLOv3 implementation in TensorFlow 2.2.0, with support for training, transfer training.
 
-## Installation
-First, clone or download this GitHub repository.
-Install requirements and download pretrained weights:
-```
-pip install -r ./requirements.txt
-
-# yolov3
+## Download YOLOv3 weights
 wget -P model_data https://pjreddie.com/media/files/yolov3.weights
 
-# yolov3-tiny
-wget -P model_data https://pjreddie.com/media/files/yolov3-tiny.weights
-```
+File structure should be arranged like this:
+─Directory
+    ├───checkpoints
+    ├───deep_sort
+    │   └───__pycache__
+    ├───IMAGES
+    │   ├───detections
+    │   │   └───summary
+    │   └───to_train
+    │       └───Archive
+    ├───log
+    ├───model_data
+    │   └───coco
+    ├───OIDv4_ToolKit-master
+    │   ├───images
+    │   ├───modules
+    │   │   └───__pycache__
+    │   └───OID
+    │       ├───csv_folder
+    │       └───Dataset
+    │           ├───test
+    │           │   ├───archive
+    │           │   │   ├───Phone
+    │           │   │   └───Vehicle_registration_plate
+    │           │   ├───Phone
+    │           │   └───Vehicle_registration_plate
+    │           └───train
+    │               ├───Phone
+    │               │   └───Label
+    │               └───Vehicle_registration_plate
+    │                   └───Label
+    ├───tools
+    └───yolov3
+        └───__pycache__
 
-## Quick start
-Start with using pretrained weights to test predictions on both image and video:
-```
-python detection_demo.py
-```
-
-<p align="center">
-    <img width="100%" src="IMAGES/city_pred.jpg" style="max-width:100%;"></a>
-</p>
-
-## Quick training for custom mnist dataset
-mnist folder contains mnist images, create training data:
-```
-python mnist/make_data.py
-```
-`./yolov3/configs.py` file is already configured for mnist training.
-
-Now, you can train it and then evaluate your model
-```
 python train.py
 tensorboard --logdir=log
 ```
@@ -42,14 +48,6 @@ Track training progress in Tensorboard and go to http://localhost:6006/:
     <img width="100%" src="IMAGES/tensorboard.png" style="max-width:100%;"></a>
 </p>
 
-Test detection with `detect_mnist.py` script:
-```
-python detect_mnist.py
-```
-Results:
-<p align="center">
-    <img width="40%" src="IMAGES/mnist_test.jpg" style="max-width:40%;"></a>
-</p>
 
 ## Custom Yolo v3 object detection training
 Custom training required to prepare dataset first, how to prepare dataset and train custom model you can read in following link:<br>

@@ -15,10 +15,9 @@ import tensorflow as tf
 from scipy.integrate import trapz, simps
 import pandas as pd
 import matplotlib.pyplot as plt
-import matplotlib.pyplot as plt
 from scipy.integrate import trapz
 
-#SEE IF THIS FIXES THE CUDNN ISSUE
+#Solves the CUDNN error issue
 physical_devices = tf.config.experimental.list_physical_devices('GPU')
 assert len(physical_devices) > 0, "Not enough GPU hardware devices available"
 config = tf.config.experimental.set_memory_growth(physical_devices[0], True)
@@ -28,8 +27,8 @@ input_size = YOLO_INPUT_SIZE
 yolo = Create_Yolov3(input_size=input_size, CLASSES=TRAIN_CLASSES)
 yolo.load_weights("./checkpoints/yolov3_custom_Phone_Plate") 
 
-test_annot_path = "model_data/dataset_test.txt"
-
+#test_annot_path = "model_data/dataset_test.txt"
+test_annot_path = ('./model_data/dataset_test.txt')
 
 # =============================================================================
 # Function to extract image path name and ground truth bounding box locations from the images
@@ -129,6 +128,8 @@ def pred_bb_location_annotations(annotations):
 gt_data = gt_bb_locations(annotations)
 pred_data = pred_bb_location_annotations(annotations)
 
+pred_data
+
 
 # =============================================================================
 # bb_intersection_over_union function copied from https://www.pyimagesearch.com/2016/11/07/intersection-over-union-iou-for-object-detection/    
@@ -160,56 +161,6 @@ def get_class(boxes):
     for det in boxes:
         detection.append(det[-1])
     return detection
-
-
-
-def calculate_AP(class_type, IOU_threshold=0.4):
-    results = get_iou_scores(gt_data, pred_data)
-    class_results = results[class_type]
-    detections = []
-    for val in class_results:
-        try:
-            if val[-1] >= IOU_threshold:
-                val[-1]='TP'
-                detections.append(val)
-            else:
-                val[-1]='FP'
-                detections.append(val)
-        except:
-            print('NO IOUs')
-            detections.append(val)
-    
-    #Change to dataframe and create columns    
-    df = pd.DataFrame(detections, columns=['Image', 'Score', 'Detection']) 
-    df = df.sort_values(by='Score', ascending=False)
-    
-    #Creates extra columns for TP, FP and FN columns
-    df['TP'] = df.apply(lambda x: 1 if x['Detection']=='TP' else 0, axis=1)
-    df['FP'] = df.apply(lambda x: 1 if x['Detection']=='FP' else 0, axis=1)
-    df['FN'] = df.apply(lambda x: 1 if x['Detection']=='FN' else 0, axis=1)
-    # Calculate precision and recall and put results into new columns
-    df['Precision'] = df['TP'].cumsum()/(df['TP'].cumsum() + df['FP'].cumsum())
-    # =============================================================================
-    # For recall we can simply use length of DF to get the total number of possible positive due to there being
-    # a max of 1 GT class per image (as mentioned earlier)
-    # =============================================================================
-    df['Recall'] = df['TP'].cumsum()/len(df) 
-    prec =  list(df.Precision)
-    #Start X at zero to allow us to calculate area under the line.
-    prec.insert(0, 1)  
-    rec = list(df.Recall)
-    rec.insert(0,0)
-    
-    #Uncomment below to display recall/precision plot
-    plt.plot(rec, prec)
-    
-       
-    #Calculates area under the line (AR)
-    return trapz(prec, rec)    
-            
-
-
-calculate_AP('Phone', IOU_threshold=0.5)
 
 
 
@@ -323,10 +274,15 @@ def calculate_AP(class_ID=0, IOU_threshold=0.4):
 # =============================================================================
 # Calculate mAP using the PASCAL VOC method of IoU threshold of 0.5
 # =============================================================================
-AP_phone = calculate_AP(0, IOU_threshold=0.5)
-AP_plate = calculate_AP(1, IOU_threshold=0.5)
+AP_phone = calculate_AP(0, IOU_threshold=0.4)
+AP_plate = calculate_AP(1, IOU_threshold=0.6)
+
+print(AP_phone)
+
 
 print(f'mAP is : {(AP_phone+AP_plate)/2}')
+
+len(pred_data)
 
 # =============================================================================
 # Uncomment below to calculate mAP using COCO challenge metric with IoU ranging from 0.5 to 0.
