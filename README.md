@@ -42,16 +42,24 @@ File structure should be arranged like this:
         └───__pycache__
 ```
 
-## Prepar images
-Once XML files have been created run XML_to_YOLOv3 in tools directory
+## Prepare images
+For Google Open Images - see OIDv4 ToolKit
+'old_to_pascal.py' to convert old Pascal to XML 
+For bespoke images - Manually annotate using 'Labelimg'
+Run 'XML_to_YOLOv3' to convert XML to Yolov3 format
+
+Once XML files have been created run 'XML_to_YOLOv3' in tools directory
 
 ## Train model
 Set ANNOT paths in config.py in YOLOv3 directory
-Train model using train.py
+Train model using 'train.py'
 tensorboard --logdir=log
 Track training progress in Tensorboard and go to http://localhost:6006/:
 
 
 ## Run model with object tracking
-Run object_tracker.py
+Run 'object_tracker.py'
 
+## References
+Cloned and modified from https://github.com/pythonlessons/TensorFlow-2.x-YOLOv3 
+For downloading stock images from Google Image Dataset - https://github.com/EscVM/OIDv4_ToolKit.git
