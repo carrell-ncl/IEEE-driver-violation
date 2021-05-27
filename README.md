@@ -7,7 +7,7 @@ wget -P model_data https://pjreddie.com/media/files/yolov3.weights
 
 File structure should be arranged like this:
 ```bash
-─Directory
+└───Directory
     ├───checkpoints
     ├───deep_sort
     │   └───__pycache__
@@ -17,10 +17,24 @@ File structure should be arranged like this:
     │   └───to_train
     │       └───Archive
     ├───log
+    ├───mAP-master
+    │   ├───input
+    │   │   ├───detection-results
+    │   │   │   └───archive
+    │   │   ├───ground-truth
+    │   │   │   ├───archive
+    │   │   │   └───backup
+    │   │   └───images-optional
+    │   │       └───archive
+    │   ├───output
+    │   │   ├───classes
+    │   │   └───images
+    │   │       └───detections_one_by_one
+    │   └───scripts
+    │       └───extra
     ├───model_data
     │   └───coco
     ├───OIDv4_ToolKit-master
-    │   ├───images
     │   ├───modules
     │   │   └───__pycache__
     │   └───OID
@@ -39,7 +53,6 @@ File structure should be arranged like this:
     │                   └───Label
     ├───tools
     └───yolov3
-        └───__pycache__
 ```
 
 ## Prepare images
@@ -56,6 +69,11 @@ Train model using 'train.py'
 tensorboard --logdir=log
 Track training progress in Tensorboard and go to http://localhost:6006/:
 
+## AP and mAP
+Test images saved in mAP-master/input/images-optional
+Annotations (Pascal format) saved in mAP-master/input/ground-truth (file names to be same name as image file)
+Run 'get_detection_results.py' to create detections files
+Set CWD to ./mAP-master and run 'main.py'
 
 ## Run model with object tracking
 Run 'object_tracker.py'
@@ -63,3 +81,4 @@ Run 'object_tracker.py'
 ## References
 Cloned and modified from https://github.com/pythonlessons/TensorFlow-2.x-YOLOv3 
 For downloading stock images from Google Image Dataset - https://github.com/EscVM/OIDv4_ToolKit.git
+For mAP - https://github.com/Cartucho/mAP

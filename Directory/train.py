@@ -33,6 +33,7 @@ if TRAIN_YOLO_TINY:
     TRAIN_MODEL_NAME = TRAIN_MODEL_NAME+"_Tiny"
     Darknet_weights = YOLO_DARKNET_TINY_WEIGHTS
 
+
 start_time = str(strftime("%H:%M", gmtime()))
 
 val_loss = []
@@ -147,6 +148,7 @@ def main():
             cur_step = results[0]%steps_per_epoch
             print("epoch:{:2.0f} step:{:5.0f}/{}, lr:{:.6f}, giou_loss:{:7.2f}, conf_loss:{:7.2f}, prob_loss:{:7.2f}, total_loss:{:7.2f}"
                   .format(epoch, cur_step, steps_per_epoch, results[1], results[2], results[3], results[4], results[5]))
+            
 
         if len(testset) == 0:
             print("configure TEST options to validate model")
@@ -170,6 +172,7 @@ def main():
         validate_writer.flush()
             
         v_loss = "\n\ngiou_val_loss:{:7.2f}, conf_val_loss:{:7.2f}, prob_val_loss:{:7.2f}, total_val_loss:{:7.2f}\n\n".format(giou_val/count, conf_val/count, prob_val/count, total_val/count) 
+        print(v_loss)
         val_loss.append(v_loss) # Append vall loss of each epoch for analysis
         #print("\n\ngiou_val_loss:{:7.2f}, conf_val_loss:{:7.2f}, prob_val_loss:{:7.2f}, total_val_loss:{:7.2f}\n\n".
               #format(giou_val/count, conf_val/count, prob_val/count, total_val/count))
@@ -190,3 +193,5 @@ current_time = str(strftime("%H:%M", gmtime()))
 print(start_time + ' plus 1 hr')
 print(current_time + ' plus 1 hr')
 val_loss
+
+

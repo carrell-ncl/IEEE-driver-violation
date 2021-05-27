@@ -40,7 +40,7 @@ if TRAIN_YOLO_TINY:
     Darknet_weights = YOLO_DARKNET_TINY_WEIGHTS
 
 #video_path   = "./IMAGES/test4.mp4"
-video_path = './IMAGES/house2.mp4'
+video_path = './IMAGES/to_train/Archive/street2.avi'
 #video_path = './IMAGES/to_train/jai2.mp4'
 csv_path = './IMAGES/detections/summary/tester.csv' #Steven - set path for master CSV
 
