@@ -1,12 +1,5 @@
 #================================================================
-#
-#   File name   : utils.py
-#   Author      : PyLessons
-#   Created date: 2020-07-15
-#   Website     : https://pylessons.com/
-#   GitHub      : https://github.com/pythonlessons/TensorFlow-2.x-YOLOv3
-#   Description : additional yolov3 functions
-#
+# Based on https://github.com/pythonlessons/TensorFlow-2.x-YOLOv3
 #================================================================
 import cv2
 import time

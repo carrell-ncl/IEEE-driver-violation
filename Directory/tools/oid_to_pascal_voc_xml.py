@@ -1,12 +1,5 @@
 #================================================================
-#
-#   File name   : oid_to_pascal_vos_xml.py
-#   Author      : PyLessons
-#   Created date: 2020-06-04
-#   Website     : https://pylessons.com/
-#   GitHub      : https://github.com/pythonlessons/TensorFlow-2.x-YOLOv3
-#   Description : used to convert oid labels to pascal vos xml
-#
+# Taken from https://github.com/pythonlessons/TensorFlow-2.x-YOLOv3
 #================================================================
 import os
 from tqdm import tqdm

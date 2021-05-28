@@ -1,12 +1,5 @@
 #================================================================
-#
-#   File name   : yolov3.py
-#   Author      : PyLessons
-#   Created date: 2020-06-04
-#   Website     : https://pylessons.com/
-#   GitHub      : https://github.com/pythonlessons/TensorFlow-2.x-YOLOv3
-#   Description : main yolov3 functions
-#
+# Based on https://github.com/pythonlessons/TensorFlow-2.x-YOLOv3
 #================================================================
 import numpy as np
 import tensorflow as tf

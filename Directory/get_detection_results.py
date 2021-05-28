@@ -11,6 +11,9 @@ from yolov3.utils import load_yolo_weights, image_preprocess, postprocess_boxes,
 from yolov3.yolov3 import Create_Yolov3
 from yolov3.configs import *
 from pathlib import Path
+import tensorflow as tf
+import numpy as np
+import matplotlib.pyplot as plt
 
 
 #Solves the CUDNN error issue
@@ -70,7 +73,7 @@ for filename in os.listdir(image_directory):
         #detection = detection_results(yolo, filename)
         image_name = Path(os.path.join(image_directory, filename)).stem
         detection = detection_results(yolo, os.path.join(image_directory, filename), image_name)
-
+print('All detection results now saved!')
         
         
         
