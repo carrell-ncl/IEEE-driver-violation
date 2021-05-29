@@ -2,6 +2,8 @@
 
 YOLOv3 implementation in TensorFlow 2.2.0, with training and object tracking
 
+![Screenshot](Directory/IMAGES/Capture1.JPG)
+
 ## Download YOLOv3 weights
 wget -P model_data https://pjreddie.com/media/files/yolov3.weights
 
