@@ -1,8 +1,9 @@
 # Identification of Driver Phone Usage Violations using YOLOv3 and DeepSort
 
 YOLOv3 implementation in TensorFlow 2.2.0, with training and object tracking
+Training and testing done using GPU (Nvidia 2080ti)
 
-![](capture.gif)
+![](capture2.gif)
 
 ## Download YOLOv3 weights
 wget -P model_data https://pjreddie.com/media/files/yolov3.weights
