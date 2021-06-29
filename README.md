@@ -11,15 +11,20 @@ wget -P model_data https://pjreddie.com/media/files/yolov3.weights
 File structure should be arranged like this:
 ```bash
 └───Directory
+    ├───archived scripts
     ├───checkpoints
     ├───deep_sort
     │   └───__pycache__
+    ├───detections
+
     ├───IMAGES
-    │   ├───detections
-    │   │   └───summary
-    │   └───to_train
-    │       └───Archive
+    │   ├───for the report
+    │   ├───frames_to_test
+    │   ├───vid_to_test
+    │   └───vid_to_train
     ├───log
+    ├───mAP
+    │   └───ground-truth
     ├───mAP-master
     │   ├───input
     │   │   ├───detection-results
@@ -28,7 +33,6 @@ File structure should be arranged like this:
     │   │   │   ├───archive
     │   │   │   └───backup
     │   │   └───images-optional
-    │   │       └───archive
     │   ├───output
     │   │   ├───classes
     │   │   └───images
@@ -44,9 +48,6 @@ File structure should be arranged like this:
     │       ├───csv_folder
     │       └───Dataset
     │           ├───test
-    │           │   ├───archive
-    │           │   │   ├───Phone
-    │           │   │   └───Vehicle_registration_plate
     │           │   ├───Phone
     │           │   └───Vehicle_registration_plate
     │           └───train
@@ -55,7 +56,7 @@ File structure should be arranged like this:
     │               └───Vehicle_registration_plate
     │                   └───Label
     ├───tools
-    └───yolov3
+    ├───yolov3
 ```
 
 ## Prepare images
