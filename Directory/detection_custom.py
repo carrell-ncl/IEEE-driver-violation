@@ -1,47 +1,36 @@
+#================================================================
+#
+#   File name   : detection_custom.py
+#   Author      : PyLessons
+#   Created date: 2020-09-17
+#   Website     : https://pylessons.com/
+#   GitHub      : https://github.com/pythonlessons/TensorFlow-2.x-YOLOv3
+#   Description : object detection image and video example
+#
+#================================================================
 import os
+os.environ['CUDA_VISIBLE_DEVICES'] = '0'
 import cv2
 import numpy as np
 import tensorflow as tf
-from yolov3.yolov3 import Create_Yolov3
-from yolov3.utils import load_yolo_weights, detect_image, detect_video, detect_realtime
+from yolov3.utils import detect_image, detect_realtime, detect_video, Load_Yolo_model, detect_video_realtime_mp, load_yolo_weights
 from yolov3.configs import *
+from yolov3.yolov4 import Create_Yolo
 
 #Solves the CUDNN error issue
 physical_devices = tf.config.experimental.list_physical_devices('GPU')
 assert len(physical_devices) > 0, "Not enough GPU hardware devices available"
 config = tf.config.experimental.set_memory_growth(physical_devices[0], True)
 
+image_path   = "./IMAGES/frames_to_test/test5.jpg"
+video_path   = "./IMAGES/june_8_1.mp4"
+#video_path = './IMAGES/rotated2.mp4'
+video_path2 = 'IMAGES/street7.mp4'
 
-input_size = YOLO_INPUT_SIZE
-Darknet_weights = YOLO_DARKNET_WEIGHTS
-if TRAIN_YOLO_TINY:
-    Darknet_weights = YOLO_DARKNET_TINY_WEIGHTS
+#TRAIN_MODEL_NAME = 'yolov4_custom_PP2'
+yolo = Load_Yolo_model()
+#detect_image(yolo, image_path, "./IMAGES/plate_1_detect.jpg", input_size=YOLO_INPUT_SIZE, show=True, CLASSES=TRAIN_CLASSES, rectangle_colors=(255,0,0))
+detect_video(yolo, video_path, './IMAGES/detected.mp4', input_size=YOLO_INPUT_SIZE, show=True, CLASSES=TRAIN_CLASSES, rectangle_colors=(255,0,0))
+#detect_realtime(yolo, '', input_size=YOLO_INPUT_SIZE, show=True, CLASSES=TRAIN_CLASSES, rectangle_colors=(255, 0, 0))
 
-
-img_path = 'C:\\Users\\Steve\\Desktop\\deeplearning\\directory\\OIDv4_ToolKit-master\\OID\\Dataset/test\\Phone/mar1.JPG'
-image_path   = "./IMAGES/to_train/may459.jpg"
-#video_path   = "./IMAGES/lightson2.asf"
-video_path = './IMAGES/house2.mp4'
-video_path2 = 'IMAGES/to_train/Archive/street6.avi'
-
-yolo = Create_Yolov3(input_size=input_size, CLASSES=TRAIN_CLASSES)
-yolo.load_weights("./checkpoints/yolov3_custom_Phone_Plate2") # use keras weights
-
-#detect_image(yolo, image_path, "./IMAGES/det1.jpg", input_size=input_size, show=True, CLASSES=TRAIN_CLASSES, rectangle_colors=(255,0,0))
-detect_video(yolo, video_path2, './IMAGES/detected4.mp4', input_size=input_size, show=True, CLASSES=TRAIN_CLASSES, rectangle_colors=(255,0,0))
-#detect_realtime(yolo, '', input_size=input_size, show=True, CLASSES=TRAIN_CLASSES, rectangle_colors=(255, 0, 0))
-
-
-# =============================================================================
-# gpus = tf.config.experimental.list_physical_devices('GPU')
-# gpus
-# len(gpus)
-# 
-# print('GPU is AVAILABLE' if tf.test.is_gpu_available() else 'NOT AVAILABLE')
-# 
-# 
-# print(tf.test.is_built_with_cuda()) 
-# print(tf.config.list_physical_devices('GPU'))
-# =============================================================================
-
-
+#detect_video_realtime_mp(video_path, "Output.mp4", input_size=YOLO_INPUT_SIZE, show=True, CLASSES=TRAIN_CLASSES, rectangle_colors=(255,0,0), realtime=False)

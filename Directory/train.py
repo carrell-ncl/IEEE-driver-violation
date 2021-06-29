@@ -1,39 +1,46 @@
 #================================================================
-# Taken from https://github.com/pythonlessons/TensorFlow-2.x-YOLOv3
+#
+#   File name   : train.py
+#   Author      : PyLessons
+#   Created date: 2020-08-06
+#   Website     : https://pylessons.com/
+#   GitHub      : https://github.com/pythonlessons/TensorFlow-2.x-YOLOv3
+#   Description : used to train custom object detector
+#
 #================================================================
 import os
-
 os.environ['CUDA_VISIBLE_DEVICES'] = '0'
+os.environ['TF_FORCE_GPU_ALLOW_GROWTH'] = 'true'
+from tensorflow.python.client import device_lib
+print(device_lib.list_local_devices())
 import shutil
 import numpy as np
 import tensorflow as tf
 #from tensorflow.keras.utils import plot_model
 from yolov3.dataset import Dataset
-from yolov3.yolov3 import Create_Yolov3, YOLOv3, decode, compute_loss
-from yolov3.utils import load_yolo_weights#, load_tiny_yolo_weights
+from yolov3.yolov4 import Create_Yolo, compute_loss
+from yolov3.utils import load_yolo_weights
 from yolov3.configs import *
-from datetime import datetime, date 
-from time import gmtime, strftime
-
+from evaluate_mAP import get_mAP
+    
 #SEE IF THIS FIXES THE CUDNN ISSUE
 physical_devices = tf.config.experimental.list_physical_devices('GPU')
 assert len(physical_devices) > 0, "Not enough GPU hardware devices available"
 config = tf.config.experimental.set_memory_growth(physical_devices[0], True)
 
+if YOLO_TYPE == "yolov4":
+    print('Loading Yolov4 weights')	
+    Darknet_weights = YOLO_V4_TINY_WEIGHTS if TRAIN_YOLO_TINY else YOLO_V4_WEIGHTS
+if YOLO_TYPE == "yolov3":
+    print('Loading Yolov3 weights')	
+    Darknet_weights = YOLO_V3_TINY_WEIGHTS if TRAIN_YOLO_TINY else YOLO_V3_WEIGHTS
+if TRAIN_YOLO_TINY: TRAIN_MODEL_NAME += "_Tiny"
 
-Darknet_weights = YOLO_DARKNET_WEIGHTS
-if TRAIN_YOLO_TINY:
-    TRAIN_MODEL_NAME = TRAIN_MODEL_NAME+"_Tiny"
-    Darknet_weights = YOLO_DARKNET_TINY_WEIGHTS
-
-
-start_time = str(strftime("%H:%M", gmtime()))
-
-val_loss = []
 def main():
     global TRAIN_FROM_CHECKPOINT
     
     gpus = tf.config.experimental.list_physical_devices('GPU')
+    print(f'GPUs {gpus}')
     if len(gpus) > 0:
         try: tf.config.experimental.set_memory_growth(gpus[0], True)
         except RuntimeError: pass
@@ -50,14 +57,13 @@ def main():
     total_steps = TRAIN_EPOCHS * steps_per_epoch
 
     if TRAIN_TRANSFER:
-        Darknet = Create_Yolov3(input_size=YOLO_INPUT_SIZE)
+        Darknet = Create_Yolo(input_size=YOLO_INPUT_SIZE, CLASSES=YOLO_COCO_CLASSES)
         load_yolo_weights(Darknet, Darknet_weights) # use darknet weights
-        #load_tiny_yolo_weights(Darknet, Darknet_weights) # use darknet weights
 
-    yolo = Create_Yolov3(input_size=YOLO_INPUT_SIZE, training=True, CLASSES=TRAIN_CLASSES)
+    yolo = Create_Yolo(input_size=YOLO_INPUT_SIZE, training=True, CLASSES=TRAIN_CLASSES)
     if TRAIN_FROM_CHECKPOINT:
         try:
-            yolo.load_weights(TRAIN_FROM_CHECKPOINT)
+            yolo.load_weights(f"./checkpoints/{TRAIN_MODEL_NAME}")
         except ValueError:
             print("Shapes are incompatible, transfering Darknet weights")
             TRAIN_FROM_CHECKPOINT = False
@@ -133,6 +139,7 @@ def main():
             
         return giou_loss.numpy(), conf_loss.numpy(), prob_loss.numpy(), total_loss.numpy()
 
+    mAP_model = Create_Yolo(input_size=YOLO_INPUT_SIZE, CLASSES=TRAIN_CLASSES) # create second model to measure mAP
 
     best_val_loss = 1000 # should be large at start
     for epoch in range(TRAIN_EPOCHS):
@@ -141,7 +148,6 @@ def main():
             cur_step = results[0]%steps_per_epoch
             print("epoch:{:2.0f} step:{:5.0f}/{}, lr:{:.6f}, giou_loss:{:7.2f}, conf_loss:{:7.2f}, prob_loss:{:7.2f}, total_loss:{:7.2f}"
                   .format(epoch, cur_step, steps_per_epoch, results[1], results[2], results[3], results[4], results[5]))
-            
 
         if len(testset) == 0:
             print("configure TEST options to validate model")
@@ -164,27 +170,20 @@ def main():
             tf.summary.scalar("validate_loss/prob_val", prob_val/count, step=epoch)
         validate_writer.flush()
             
-        v_loss = "\n\ngiou_val_loss:{:7.2f}, conf_val_loss:{:7.2f}, prob_val_loss:{:7.2f}, total_val_loss:{:7.2f}\n\n".format(giou_val/count, conf_val/count, prob_val/count, total_val/count) 
-        print(v_loss)
-        val_loss.append(v_loss) # Append vall loss of each epoch for analysis
-        #print("\n\ngiou_val_loss:{:7.2f}, conf_val_loss:{:7.2f}, prob_val_loss:{:7.2f}, total_val_loss:{:7.2f}\n\n".
-              #format(giou_val/count, conf_val/count, prob_val/count, total_val/count))
+        print("\n\ngiou_val_loss:{:7.2f}, conf_val_loss:{:7.2f}, prob_val_loss:{:7.2f}, total_val_loss:{:7.2f}\n\n".
+              format(giou_val/count, conf_val/count, prob_val/count, total_val/count))
 
         if TRAIN_SAVE_CHECKPOINT and not TRAIN_SAVE_BEST_ONLY:
-            yolo.save_weights(os.path.join(TRAIN_CHECKPOINTS_FOLDER, TRAIN_MODEL_NAME+"_val_loss_{:7.2f}".format(total_val/count)))
+            save_directory = os.path.join(TRAIN_CHECKPOINTS_FOLDER, TRAIN_MODEL_NAME+"_val_loss_{:7.2f}".format(total_val/count))
+            yolo.save_weights(save_directory)
         if TRAIN_SAVE_BEST_ONLY and best_val_loss>total_val/count:
-            yolo.save_weights(os.path.join(TRAIN_CHECKPOINTS_FOLDER, TRAIN_MODEL_NAME))
+            save_directory = os.path.join(TRAIN_CHECKPOINTS_FOLDER, TRAIN_MODEL_NAME)
+            yolo.save_weights(save_directory)
             best_val_loss = total_val/count
         if not TRAIN_SAVE_BEST_ONLY and not TRAIN_SAVE_CHECKPOINT:
-            yolo.save_weights(os.path.join(TRAIN_CHECKPOINTS_FOLDER, TRAIN_MODEL_NAME))
+            save_directory = os.path.join(TRAIN_CHECKPOINTS_FOLDER, TRAIN_MODEL_NAME)
+            yolo.save_weights(save_directory)
 
-
+        
 if __name__ == '__main__':
     main()
-
-current_time = str(strftime("%H:%M", gmtime()))
-print(start_time + ' plus 1 hr')
-print(current_time + ' plus 1 hr')
-val_loss
-
-

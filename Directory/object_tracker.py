@@ -1,15 +1,14 @@
 #================================================================
-# Based on https://github.com/pythonlessons/TensorFlow-2.x-YOLOv3
-#================================================================
+#Based on https://github.com/pythonlessons/TensorFlow-2.x-YOLOv3
+#============================================================
 import os
+os.environ['CUDA_VISIBLE_DEVICES'] = '0'
 import cv2
 import numpy as np
 import tensorflow as tf
-from yolov3.yolov3 import Create_Yolov3
-from yolov3.utils import load_yolo_weights, image_preprocess, postprocess_boxes, nms, draw_bbox, read_class_names#, detect_image, detect_video, detect_realtime
-import time
+from yolov3.utils import Load_Yolo_model, image_preprocess, postprocess_boxes, nms, draw_bbox, read_class_names
 from yolov3.configs import *
-
+import time
 
 from deep_sort import nn_matching
 from deep_sort.detection import Detection
@@ -17,34 +16,20 @@ from deep_sort.tracker import Tracker
 from deep_sort import generate_detections as gdet
 from datetime import datetime, date 
 from time import gmtime, strftime  #Steven - added for sceduling the daily writing of detection_time_list to .txt file
-import os.path
 import pandas as pd
 
-#Solves the CUDNN error issue
+#SEE IF THIS FIXES THE CUDNN ISSUE
 physical_devices = tf.config.experimental.list_physical_devices('GPU')
 assert len(physical_devices) > 0, "Not enough GPU hardware devices available"
 config = tf.config.experimental.set_memory_growth(physical_devices[0], True)
 
+yolo = Load_Yolo_model()
 
+video_path = "./IMAGES/street2.avi"
+video_path2 = 'IMAGES/vid_to_train/street1.avi'
+csv_path = './detections/summary/' #Steven - set path for master CSV
 
-input_size = YOLO_INPUT_SIZE
-Darknet_weights = YOLO_DARKNET_WEIGHTS
-if TRAIN_YOLO_TINY:
-    Darknet_weights = YOLO_DARKNET_TINY_WEIGHTS
-
-#video_path   = "./IMAGES/test4.mp4"
-video_path = './IMAGES/to_train/Archive/street2.avi'
-#video_path = './IMAGES/to_train/jai2.mp4'
-csv_path = './IMAGES/detections/summary/tester.csv' #Steven - set path for master CSV
-
-#yolo = Create_Yolov3(input_size=input_size)
-yolo = Create_Yolov3(input_size=input_size, CLASSES=TRAIN_CLASSES)
-#load_yolo_weights(yolo, Darknet_weights) # use Darknet weights
-yolo.load_weights("./checkpoints/yolov3_custom_Phone_Plate") # use keras weights
-
-
-
-def Object_tracking(YoloV3, video_path, output_path, input_size=416, show=False, CLASSES=TRAIN_CLASSES, score_threshold=0.4, iou_threshold=0.45, rectangle_colors='', Track_only = []):
+def Object_tracking(Yolo, video_path, output_path, input_size=416, show=False, CLASSES=TRAIN_CLASSES, score_threshold=0.4, iou_threshold=0.45, rectangle_colors='', Track_only = []):
     # Definition of the parameters
     max_cosine_distance = 0.7
     nn_budget = None
@@ -55,14 +40,13 @@ def Object_tracking(YoloV3, video_path, output_path, input_size=416, show=False,
     metric = nn_matching.NearestNeighborDistanceMetric("cosine", max_cosine_distance, nn_budget)
     tracker = Tracker(metric)
 
-    times = []
     ID_LIST = [] #Steven - used to output images based on condition
     detection_time_list = [] #Steven - used to store all the detection times 
     
+    times, times_2 = [], []
 
     if video_path:
         vid = cv2.VideoCapture(video_path) # detect on video
-       
     else:
         vid = cv2.VideoCapture(0) # detect from webcam
 
@@ -76,6 +60,7 @@ def Object_tracking(YoloV3, video_path, output_path, input_size=416, show=False,
     NUM_CLASS = read_class_names(CLASSES)
     key_list = list(NUM_CLASS.keys()) 
     val_list = list(NUM_CLASS.values())
+    fps_list = []
     
     current_day = datetime.today().strftime('%d/%m/%Y')
     current_time = str(strftime("%H:%M", gmtime()))
@@ -83,30 +68,40 @@ def Object_tracking(YoloV3, video_path, output_path, input_size=416, show=False,
     phone_det_counter = 0
     plate_det_counter = 0
     
+    frame_counter = 0
+    
     while True:
-        _, img = vid.read()
-        
+        _, frame = vid.read()
+
         try:
-            original_image = cv2.cvtColor(img, cv2.COLOR_BGR2RGB)
-            original_image = cv2.cvtColor(original_image, cv2.COLOR_BGR2RGB)
+            original_frame = cv2.cvtColor(frame, cv2.COLOR_BGR2RGB)
+            original_frame = cv2.cvtColor(original_frame, cv2.COLOR_BGR2RGB)
         except:
             break
-        image_data = image_preprocess(np.copy(original_image), [input_size, input_size])
-        image_data = tf.expand_dims(image_data, 0)
         
+        image_data = image_preprocess(np.copy(original_frame), [input_size, input_size])
+        #image_data = tf.expand_dims(image_data, 0)
+        image_data = image_data[np.newaxis, ...].astype(np.float32)
+
         t1 = time.time()
-        pred_bbox = YoloV3.predict(image_data)
-
+        if YOLO_FRAMEWORK == "tf":
+            pred_bbox = Yolo.predict(image_data)
+        elif YOLO_FRAMEWORK == "trt":
+            batched_input = tf.constant(image_data)
+            result = Yolo(batched_input)
+            pred_bbox = []
+            for key, value in result.items():
+                value = value.numpy()
+                pred_bbox.append(value)
+        
+        #t1 = time.time()
+        #pred_bbox = Yolo.predict(image_data)
         t2 = time.time()
-
-
-        times.append(t2-t1)
-        times = times[-20:]
         
         pred_bbox = [tf.reshape(x, (-1, tf.shape(x)[-1])) for x in pred_bbox]
         pred_bbox = tf.concat(pred_bbox, axis=0)
 
-        bboxes = postprocess_boxes(pred_bbox, original_image, input_size, score_threshold)
+        bboxes = postprocess_boxes(pred_bbox, original_frame, input_size, score_threshold)
         bboxes = nms(bboxes, iou_threshold, method='nms')
 
         # extract bboxes to boxes (x, y, width, height), scores and names
@@ -121,16 +116,16 @@ def Object_tracking(YoloV3, video_path, output_path, input_size=416, show=False,
         boxes = np.array(boxes) 
         names = np.array(names)
         scores = np.array(scores)
-        features = np.array(encoder(original_image, boxes))
+        features = np.array(encoder(original_frame, boxes))
         detections = [Detection(bbox, score, class_name, feature) for bbox, score, class_name, feature in zip(boxes, scores, names, features)]
+
         # Pass detections to the deepsort object and obtain the track information.
         tracker.predict()
         tracker.update(detections)
-        
 
         # Obtain info from the tracks
         tracked_bboxes = []
-        ID = []
+        ID =[]
         for track in tracker.tracks:
             if not track.is_confirmed() or track.time_since_update > 5:
                 continue 
@@ -138,82 +133,120 @@ def Object_tracking(YoloV3, video_path, output_path, input_size=416, show=False,
             class_name = track.get_class() #Get the class name of particular object
             tracking_id = track.track_id # Get the ID for the particular track
             index = key_list[val_list.index(class_name)] # Get predicted object index by object name
-            #Steven - Added scores to tracked boxes so we can see probability confidence of each detection
-
-            tracked_bboxes.append(bbox.tolist() + [tracking_id, index, scores]) # Structure data, that we could use it with our draw_bbox function
+            tracked_bboxes.append(bbox.tolist() + [tracking_id, index]) # Structure data, that we could use it with our draw_bbox function
+            
             ID.append(tracking_id)
             
-            
-            
+        # draw detection on frame
+        image = draw_bbox(original_frame, tracked_bboxes, CLASSES=CLASSES, tracking=True)
+
+        t3 = time.time()
+        times.append(t2-t1)
+        times_2.append(t3-t1)
         
+        times = times[-20:]
+        times_2 = times_2[-20:]
+
         ms = sum(times)/len(times)*1000
         fps = 1000 / ms
-    
-       
-            
-        # draw detection on frame
-        image = draw_bbox(original_image, tracked_bboxes, CLASSES=CLASSES, tracking=True)
-        image = cv2.putText(image, "FPS: {:.1f}".format(fps), (0, 30), cv2.FONT_HERSHEY_COMPLEX_SMALL, 1, (0, 0, 255), 2)
+        fps2 = 1000 / (sum(times_2)/len(times_2)*1000)
         
-        #****Steven - add date and time to image
-        #today = date.today()
+        image = cv2.putText(image, "Time: {:.1f} FPS".format(fps), (0, 30), cv2.FONT_HERSHEY_COMPLEX_SMALL, 1, (0, 0, 255), 2)
+
+        # draw original yolo detection
+        #image = draw_bbox(image, bboxes, CLASSES=CLASSES, show_label=False, rectangle_colors=rectangle_colors, tracking=True)
+        fps_list.append(fps)
+        #print("Time: {:.2f}ms, Detection FPS: {:.1f}, total FPS: {:.1f}".format(ms, fps, fps2))
+        
+        #Create new directory each day to store images of detections
         new_day = datetime.today().strftime('%d/%m/%Y')
+        format_today = new_day.replace('/', '')
+        
+        if os.path.exists(f'./detections/{format_today}'):
+            pass
+        else:
+            os.mkdir(f'./detections/{format_today}')
+        
+        #Add date and time to the image
         now = datetime.now()
         time_str = now.strftime("%d/%m/%Y %H:%M:%S")
         image = cv2.putText(image, time_str, (1000, 30), cv2.FONT_HERSHEY_COMPLEX_SMALL, 1, (0, 0, 255), 2)
-
+        
         #Below loop to check if ID has been seen, if not take snapshot and save in directory. ID will then be appended to the list to 
         #ensure more snapshots of the same ID are not saved.
         
-
+        
         new_hour = str(strftime("%H", gmtime()))
         for id_no in ID:
             if id_no not in ID_LIST:
                 det = 'Detection ' + class_name + ' ' + str(id_no) + ' at ' + time_str
                 print(det)               
-                cv2.imwrite('./IMAGES/detections/detection'+str(id_no)+'.jpg', image)
-                detection_time_list.append(det + ' Image location: ' + './IMAGES/detections/detection'+str(id_no)+'.jpg')
+                detection_time_list.append(f'{det} Image location: ./detections/{format_today}/Detection {class_name} {str(id_no)}.0.jpg')
                 ID_LIST.append(id_no)
                 print(class_name)
+                frame_counter = 20
                 if class_name == 'Phone':
+                    cv2.imwrite(f'./detections/{format_today}/Detection {class_name} {str(id_no)}.0.jpg', image)
                     phone_det_counter+=1
                     print('Phone count ' + str(phone_det_counter))
                 else:
                     plate_det_counter+=1
                     print('Vehicle count ' + str(plate_det_counter))
+        
+        #Takes a further n snap shots in order to ensure a good image is taken            
+        if frame_counter>0 and class_name == 'Phone':
+            cv2.imwrite(f'./detections/{format_today}/Detection {class_name} {str(id_no)}.{20-frame_counter}.jpg', image)
+            frame_counter-=1
+            
                 
         ##TO DO!!! Sort out the double appended hours whenever you re-fun program
+        
+        
         if new_hour != current_hour:
             if os.path.exists(csv_path):
                 day_df = pd.DataFrame({"Date   ":[current_day], "Hour":[current_hour[0:2]], 
                  "Phone Detections":[phone_det_counter], "Vehicle Detections":[plate_det_counter]}) 
-                master_csv = pd.read_csv('./IMAGES/detections/summary/tester.csv')
+                master_csv = pd.read_csv('./detections/summary/tester.csv')
             
                 master_csv = master_csv.append(day_df)
-                master_csv.to_csv('./IMAGES/detections/summary/tester.csv', encoding='utf-8', index=False)
+                master_csv.to_csv('./detections/summary/tester.csv', encoding='utf-8', index=False)
             else:
+                os.mkdir('./detections/summary')
                 master_csv = pd.DataFrame({"Date   ":[current_day], "Hour":[current_hour[0:2]], 
                  "Phone Detections":[phone_det_counter], "Vehicle Detections":[plate_det_counter]}) 
-                master_csv.to_csv('./IMAGES/detections/summary/tester.csv', encoding='utf-8', index=False)
-            phone_det_counter = 0
-            plate_det_counter = 0
+                master_csv.to_csv('./detections/summary/tester.csv', encoding='utf-8', index=False)
+            
+            #phone_det_counter = 0
+            #plate_det_counter = 0
             current_hour = new_hour
-        
+            
+        else:
+            if os.path.exists(csv_path):
+                master_csv = pd.DataFrame({"Date   ":[current_day], "Hour":[current_hour[0:2]], 
+                                           "Phone Detections":[phone_det_counter], "Vehicle Detections":[plate_det_counter]}) 
+                master_csv.to_csv('./detections/summary/tester.csv', encoding='utf-8', index=False)
+            else:
+                os.mkdir('./detections/summary')
+                master_csv = pd.DataFrame({"Date   ":[current_day], "Hour":[current_hour[0:2]], 
+                 "Phone Detections":[phone_det_counter], "Vehicle Detections":[plate_det_counter]}) 
+                master_csv.to_csv('./detections/summary/tester.csv', encoding='utf-8', index=False)
+
+
         
 
         #Below code will write and save .txt file every 24 hours to show the daily detections which includes class, ID, time and also output 
         #file name. Daily detections added to the master CSV for futher analysis.
         new_time = str(strftime("%H:%M", gmtime()))
         
-        format_today = new_day.replace('/', '')
-#Changed to write each minute for the purpose of testing code. Need to remove 'str(current_time) and also change to
-#'if new_date != current date'
+        
+        #Changed to write each minute for the purpose of testing code. Need to remove 'str(current_time) and also change to
+        #'if new_date != current date'
         #if new_day != current_day
         if new_time != current_time:
             no_detections = len(detection_time_list)
             detection_time_list.append('NUMBER OF DETECTIONS TODAY: ' + str(no_detections))
 
-            with open("./IMAGES/detections/" + format_today + '_Hour_' + str(current_time[0:2]) + ".txt", "w") as output:
+            with open(f"./detections/{format_today}_Hour_{str(current_time[0:2])}.txt", "w") as output:
                 for row in detection_time_list:
                     output.write(str(row) + '\n')
             print('Saved new')
@@ -221,11 +254,8 @@ def Object_tracking(YoloV3, video_path, output_path, input_size=416, show=False,
             current_time = new_time
 
         #****
-
-        # draw original yolo detection
-        #image = draw_bbox(image, bboxes, CLASSES=CLASSES, show_label=False, rectangle_colors=rectangle_colors, tracking=True)
-
-        #print("Time: {:.2f}ms, {:.1f} FPS".format(ms, fps))q
+        
+        
         if output_path != '': out.write(image)
         if show:
             cv2.imshow('output', image)
@@ -233,11 +263,15 @@ def Object_tracking(YoloV3, video_path, output_path, input_size=416, show=False,
             if cv2.waitKey(25) & 0xFF == ord("q"):
                 cv2.destroyAllWindows()
                 break
-      
+         
+    try:
+        print(f'Average FPS is: {sum(fps_list)/len(fps_list)}')
+    except:
+        print('No video')        
     cv2.destroyAllWindows()
 
 
-Object_tracking(yolo, video_path, "./IMAGES/detection.mp4", input_size=input_size, show=True, iou_threshold=0.1, rectangle_colors=(255,0,0), Track_only = [])
-#Object_tracking(yolo, video_path=False, output_path="", input_size=input_size, show=True, iou_threshold=0.1, rectangle_colors=(255,0,0), Track_only = [])
+
+Object_tracking(yolo, video_path, "detection.mp4", input_size=YOLO_INPUT_SIZE, show=True, iou_threshold=0.1, rectangle_colors=(255,0,0), Track_only = [])
 
 

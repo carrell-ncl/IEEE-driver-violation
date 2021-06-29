@@ -3,7 +3,7 @@
 YOLOv3 implementation in TensorFlow 2.2.0, with training and object tracking
 Training and testing done using GPU (Nvidia 2080ti)
 
-![](capture2.gif)
+![](capture3.gif)
 
 ## Download YOLOv3 weights
 wget -P model_data https://pjreddie.com/media/files/yolov3.weights
