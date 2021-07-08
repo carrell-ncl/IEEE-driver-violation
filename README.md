@@ -95,7 +95,7 @@ When run for the first time the script will create a new sub-directory (detectio
 Whenever there is a new unique detection of a person using their phone, 20 images will be taken (for each frame) and saved in a sub-folder for that particular day. A .txt file will be created for each day to store all the detections whilst reverencing the output image name and location.
 Finally, a .csv file is created/added too for all detections for each day and hour of the day. This file will be used for our user interface to interrogate the historic data.
 
-![](detection.jpg)
+![](Detection.jpg)
 
 ## References
 Cloned and modified from https://github.com/pythonlessons/TensorFlow-2.x-YOLOv3 \
