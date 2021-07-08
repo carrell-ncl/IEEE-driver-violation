@@ -79,6 +79,8 @@ Train model using 'train.py' \
 tensorboard --logdir=log \
 Track training progress in Tensorboard and go to http://localhost:6006\:
 
+![](tensorboard.jpg)
+
 ## AP and mAP
 Test images saved in mAP-master/input/images-optional \
 Annotations (Pascal format) saved in mAP-master/input/ground-truth (file names to be same name as image / file) \
