@@ -1,12 +1,16 @@
 # Identification of Driver Phone Usage Violations using YOLOv3 and DeepSort
 
-YOLOv3 implementation in TensorFlow 2.2.0, with training and object tracking
+YOLOv4 implementation in TensorFlow 2.2.0, with training and object tracking
 Training and testing done using GPU (Nvidia 2080ti)
 
 ![](capture3.gif)
 
-## Download YOLOv3 weights
+## Download YOLOv3/v4 weights
+# yolov3
 wget -P model_data https://pjreddie.com/media/files/yolov3.weights
+
+# yolov4
+wget -P model_data https://github.com/AlexeyAB/darknet/releases/download/darknet_yolo_v3_optimal/yolov4.weights
 
 File structure should be arranged like this:
 ```bash
@@ -66,6 +70,8 @@ For bespoke images - Manually annotate using 'Labelimg' \
 Run 'XML_to_YOLOv3' to convert XML to Yolov3 format \
 
 Once XML files have been created run 'XML_to_YOLOv3' in tools directory
+
+![](annot.JPG)
 
 ## Train model
 Set ANNOT paths in config.py in YOLOv3 directory \
