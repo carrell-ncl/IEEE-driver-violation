@@ -3,7 +3,7 @@
 YOLOv4 implementation in TensorFlow 2.2.0, with training and object tracking
 Training and testing done using GPU (Nvidia 2080ti)
 
-![](capture3.gif)
+![](capture.gif)
 
 ## Download YOLOv3/v4 weights
 yolov3
@@ -89,6 +89,11 @@ Once XML files have been created run 'XML_to_YOLOv3' in tools directory
 - Set CWD to ./mAP-master and run 'main.py'
 
 ## Set up config file
+#When running two step:
+- TRAIN_MODEL_NAME is set to windscreen detector and TRAIN_MODEL_NAME2 is set to phone detector
+- YOLO_INPUT_SIZE and YOLO_INPUT_SIZE2 should be set accordingly
+- Ensure class_names.txt class set to **Vehicle ID:** amd class_names2.txt set to **Phone** located in **/model_data** director
+
 
 ## Run model with object tracking
 - For one_step - run 'tracker_one_step.py' \
