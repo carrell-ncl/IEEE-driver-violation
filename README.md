@@ -66,16 +66,16 @@ File structure should be arranged like this:
 ## Prepare images
 - For Google Open Images - see OIDv4 ToolKit 
 - 'old_to_pascal.py' to convert old Pascal to XML 
-- For bespoke images - Manually annotate using 'Labelimg' 
+- For bespoke images - Manually annotate using **Labelimg** 
 - Run 'XML_to_YOLOv3' to convert XML to Yolov3 format 
 
-Once XML files have been created run 'XML_to_YOLOv3' in tools directory
+Once XML files have been created run **XML_to_YOLOv3.py** in tools directory
 
 ![](annot.JPG)
 
 ## Train model
 - Set ANNOT paths in config.py in YOLOv3 directory 
-- Train model using 'train.py' 
+- Train model using **train.py** 
 - tensorboard --logdir=log 
 - Track training progress in Tensorboard and go to http://localhost:6006\:
 
@@ -85,8 +85,8 @@ Once XML files have been created run 'XML_to_YOLOv3' in tools directory
 - Test images saved in mAP-master/input/images-optional 
 - Annotations (Pascal format) saved in mAP-master/input/ground-truth (file names to be same name as image / file) 
 - Run 'get_detection_results.py' to create detections files 
-- Select IOU threshold in main.py - default set to 0.1
-- Set CWD to ./mAP-master and run 'main.py'
+- Select IOU threshold in **main.py** - default set to 0.1
+- Set CWD to ./mAP-master and run **main.py**
 
 ## Set up config file
 #When running two step:
@@ -94,17 +94,16 @@ Once XML files have been created run 'XML_to_YOLOv3' in tools directory
 - YOLO_INPUT_SIZE and YOLO_INPUT_SIZE2 should be set accordingly
 - Ensure class_names.txt class set to **Vehicle ID:** amd class_names2.txt set to **Phone** located in **/model_data** director
 
-
 ## Run model with object tracking
-- For one_step - run 'tracker_one_step.py' \
-- For two_step - run 'tracker_two_step' \
+- For one_step - run **tracker_one_step.py**
+- For two_step - run **tracker_two_step**
 
-When run for the first time the script will create a a new directory - 'detections' as well as a subdirectory with today's date to store images, as well as summary directory to store and update the CSV file.
-To automatically take and save snapshots of the detections, set 'take_snapshot' argument to True
+When ran for the first time the script will create a a new directory - **detections** as well as a subdirectory with today's date to store images, and **summary** subdirectory to store and update the CSV file.
+To automatically take and save snapshots of the detections, set **take_snapshot** argument to True
 
 ![](Detection.jpg)
 
 ## References
-- Cloned and modified from https://github.com/pythonlessons/TensorFlow-2.x-YOLOv3 \
-- For downloading stock images from Google Image Dataset - https://github.com/EscVM/OIDv4_ToolKit.git \
+- Cloned and modified from https://github.com/pythonlessons/TensorFlow-2.x-YOLOv3 
+- For downloading stock images from Google Image Dataset - https://github.com/EscVM/OIDv4_ToolKit.git 
 - For mAP - https://github.com/Cartucho/mAP
