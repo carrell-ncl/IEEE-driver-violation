@@ -402,6 +402,30 @@ def Create_Yolo(input_size=416, channels=3, training=False, CLASSES=YOLO_COCO_CL
     Yolo = tf.keras.Model(input_layer, output_tensors)
     return Yolo
 
+def Create_Yolo2(input_size=416, channels=3, training=False, CLASSES=YOLO_COCO_CLASSES):
+    NUM_CLASS = len(read_class_names(CLASSES))
+    input_layer  = Input([input_size, input_size, channels])
+
+    if TRAIN_YOLO_TINY2:
+        if YOLO_TYPE == "yolov4":
+            conv_tensors = YOLOv4_tiny(input_layer, NUM_CLASS)
+        if YOLO_TYPE == "yolov3":
+            conv_tensors = YOLOv3_tiny(input_layer, NUM_CLASS)
+    else:
+        if YOLO_TYPE == "yolov4":
+            conv_tensors = YOLOv4(input_layer, NUM_CLASS)
+        if YOLO_TYPE == "yolov3":
+            conv_tensors = YOLOv3(input_layer, NUM_CLASS)
+
+    output_tensors = []
+    for i, conv_tensor in enumerate(conv_tensors):
+        pred_tensor = decode(conv_tensor, NUM_CLASS, i)
+        if training: output_tensors.append(conv_tensor)
+        output_tensors.append(pred_tensor)
+
+    Yolo = tf.keras.Model(input_layer, output_tensors)
+    return Yolo
+
 
 def decode(conv_output, NUM_CLASS, i=0):
     # where i = 0, 1 or 2 to correspond to the three grid scales  

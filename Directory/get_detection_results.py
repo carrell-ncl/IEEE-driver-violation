@@ -7,7 +7,7 @@ Created on Wed May 26 16:44:15 2021
 
 import os
 import cv2
-from yolov3.utils import load_yolo_weights, image_preprocess, postprocess_boxes, nms, draw_bbox, Load_Yolo_model
+from yolov3.utils import load_yolo_weights, image_preprocess, postprocess_boxes, nms, draw_bbox, Load_Yolo_model, Load_Yolo_model2
 from yolov3.yolov3 import Create_Yolov3
 from yolov3.configs import *
 from pathlib import Path
@@ -21,9 +21,8 @@ physical_devices = tf.config.experimental.list_physical_devices('GPU')
 assert len(physical_devices) > 0, "Not enough GPU hardware devices available"
 config = tf.config.experimental.set_memory_growth(physical_devices[0], True)
 
-input_size = YOLO_INPUT_SIZE
 
-yolo = Load_Yolo_model()
+yolo = Load_Yolo_model2()
 
 #image_path   = "mAP-master/input/images-optional/mar1.JPG"
 image_directory = "mAP-master/input/images-optional"
@@ -36,7 +35,7 @@ dic = ['Phone', 'Vehicle_registration_plate']
 # =============================================================================
 # Gets predicted bounding box locations. Taken from detect image function and modified
 # =============================================================================
-def detection_results(YoloV3, image_path, image_name, input_size=YOLO_INPUT_SIZE, CLASSES=TRAIN_CLASSES  , score_threshold=0.3, iou_threshold=0.45):
+def detection_results(YoloV3, image_path, image_name, input_size=YOLO_INPUT_SIZE2 , CLASSES=TRAIN_CLASSES  , score_threshold=0.3, iou_threshold=0.45):
     original_image      = cv2.imread(image_path)
     original_image      = cv2.cvtColor(original_image, cv2.COLOR_BGR2RGB)
     original_image      = cv2.cvtColor(original_image, cv2.COLOR_BGR2RGB)

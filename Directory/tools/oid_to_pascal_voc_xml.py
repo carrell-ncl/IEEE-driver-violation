@@ -19,7 +19,7 @@ from lxml import etree
 foldername = os.path.basename(os.getcwd())
 if foldername == "tools": os.chdir("..")
 
-Dataset_path = "OIDv4_ToolKit/OID/Dataset"
+Dataset_path = "./OIDv4_ToolKit-master/OID/Dataset"
 
 def convert_to_xml():
     current_path = os.getcwd()
@@ -28,6 +28,7 @@ def convert_to_xml():
 
     for DIR in DIRS:
         if os.path.isdir(DIR):
+            print(DIR)
             os.chdir(DIR)
 
             print("Currently in Subdirectory:", DIR)

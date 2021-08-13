@@ -1,0 +1,26 @@
+<annotation>
+	<folder>windscreen</folder>
+	<filename>worstcase.jpg</filename>
+	<path>/Users/carrell/Desktop/windscreen/worstcase.jpg</path>
+	<source>
+		<database>Unknown</database>
+	</source>
+	<size>
+		<width>1798</width>
+		<height>1352</height>
+		<depth>3</depth>
+	</size>
+	<segmented>0</segmented>
+	<object>
+		<name>WIndscreen</name>
+		<pose>Unspecified</pose>
+		<truncated>0</truncated>
+		<difficult>0</difficult>
+		<bndbox>
+			<xmin>40</xmin>
+			<ymin>321</ymin>
+			<xmax>1073</xmax>
+			<ymax>715</ymax>
+		</bndbox>
+	</object>
+</annotation>

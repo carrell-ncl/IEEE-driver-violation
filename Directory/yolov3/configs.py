@@ -1,13 +1,6 @@
 #================================================================
-#
-#   File name   : configs.py
-#   Author      : PyLessons
-#   Created date: 2020-08-18
-#   Website     : https://pylessons.com/
-#   GitHub      : https://github.com/pythonlessons/TensorFlow-2.x-YOLOv3
-#   Description : yolov3 configuration file
-#
-#================================================================
+#Based on https://github.com/pythonlessons/TensorFlow-2.x-YOLOv3
+#============================================================
 
 # YOLO options
 YOLO_TYPE                   = "yolov4" # yolov4 or yolov3
@@ -24,7 +17,8 @@ YOLO_STRIDES                = [8, 16, 32]
 YOLO_IOU_LOSS_THRESH        = 0.5
 YOLO_ANCHOR_PER_SCALE       = 3
 YOLO_MAX_BBOX_PER_SCALE     = 100
-YOLO_INPUT_SIZE             = 512
+YOLO_INPUT_SIZE             = 320
+YOLO_INPUT_SIZE2            = 320
 if YOLO_TYPE                == "yolov4":
     YOLO_ANCHORS            = [[[12,  16], [19,   36], [40,   28]],
                                [[36,  75], [76,   55], [72,  146]],
@@ -34,29 +28,32 @@ if YOLO_TYPE                == "yolov3":
                                [[30,  61], [62,   45], [59,  119]],
                                [[116, 90], [156, 198], [373, 326]]]
 # Train options
-TRAIN_YOLO_TINY             = False
+TRAIN_YOLO_TINY             = False#For first trained model
+TRAIN_YOLO_TINY2            = False #For second trained model
 TRAIN_SAVE_BEST_ONLY        = True # saves only best model according validation loss (True recommended)
 TRAIN_SAVE_CHECKPOINT       = False # saves all best validated checkpoints in training process (may require a lot disk space) (False recommended)
 TRAIN_CLASSES               = "model_data/class_names.txt"
+TRAIN_CLASSES2               = "model_data/class_names2.txt" #Uncomment if detecting windscreens first. (This should be the phone detector)
 TRAIN_ANNOT_PATH            = "model_data/dataset_train.txt"
 TRAIN_LOGDIR                = "log"
 TRAIN_CHECKPOINTS_FOLDER    = "checkpoints"
-TRAIN_MODEL_NAME            = f"{YOLO_TYPE}_custom_PP7_512"
+TRAIN_MODEL_NAME            = f"{YOLO_TYPE}_custom_windscreen2_320"
+TRAIN_MODEL_NAME2            = f"{YOLO_TYPE}_custom_PP7_320"  #Uncomment if detecting windscreens first. (This should be the phone detector)
 TRAIN_LOAD_IMAGES_TO_RAM    = True # With True faster training, but need more RAM
-TRAIN_BATCH_SIZE            = 4
-TRAIN_INPUT_SIZE            = 512
+TRAIN_BATCH_SIZE            = 2
+TRAIN_INPUT_SIZE            = 320
 TRAIN_DATA_AUG              = True
 TRAIN_TRANSFER              = True
 TRAIN_FROM_CHECKPOINT       = False # "checkpoints/yolov3_custom"
 TRAIN_LR_INIT               = 1e-4
 TRAIN_LR_END                = 1e-6
 TRAIN_WARMUP_EPOCHS         = 2
-TRAIN_EPOCHS                = 13
+TRAIN_EPOCHS                = 50
 
 # TEST options
 TEST_ANNOT_PATH             = "model_data/dataset_test.txt"
 TEST_BATCH_SIZE             = 4
-TEST_INPUT_SIZE             = 512
+TEST_INPUT_SIZE             = 320
 TEST_DATA_AUG               = False
 TEST_DECTECTED_IMAGE_PATH   = ""
 TEST_SCORE_THRESHOLD        = 0.3

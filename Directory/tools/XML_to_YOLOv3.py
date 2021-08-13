@@ -64,3 +64,15 @@ def run_XML_to_YOLOv3():
             file.write(str(name)+'\n')
 
 run_XML_to_YOLOv3()
+
+
+
+
+        
+
+    
+    
+    
+    
+    
+    
