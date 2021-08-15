@@ -33,7 +33,7 @@ config = tf.config.experimental.set_memory_growth(physical_devices[0], True)
 yolo = Load_Yolo_model() #Loads windscreen detector
 yolo2 = Load_Yolo_model2() #Loads phone detector
 
-video_path = "./IMAGES/traffic4.mp4"
+video_path = "./IMAGES/drive13.mp4"
 video_path2 = 'IMAGES/june_8_1.mp4'
 csv_path = './detections/summary/tester.csv' #Set path for master CSV
             
@@ -178,6 +178,11 @@ def Object_tracking(Yolo, Yolo2, video_path, output_path, input_size=YOLO_INPUT_
             pass
         else:
             os.mkdir(f'./detections/{format_today}')
+            
+        if os.path.exists('./detections/summary'):
+            pass
+        else:
+            os.mkdir('./detections/summary')
 
         for detection in tracked_bboxes:
             #print(detection[-2])
@@ -317,7 +322,7 @@ def Object_tracking(Yolo, Yolo2, video_path, output_path, input_size=YOLO_INPUT_
     print(f'Total number of vehicles: {vehicle_count}')
 
 
-Object_tracking(yolo, yolo2,  video_path2, "detection2.mp4", show=True, iou_threshold=0.1,  Track_only = [], take_snapshots=False)
+Object_tracking(yolo, yolo2,  video_path, "detection2.mp4", show=True, iou_threshold=0.1,  Track_only = [], take_snapshots=True)
 
 
 

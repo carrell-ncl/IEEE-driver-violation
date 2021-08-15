@@ -1,9 +1,18 @@
 # Identification of Driver Phone Usage Violations using YOLOv4 and DeepSort
 
-YOLOv4 implementation in TensorFlow 2.2.0, with training and object tracking
+YOLOv4 and YOLOv4 implementation in TensorFlow 2.2.0, with training and object tracking
 Training and testing done using GPU (Nvidia 2080ti)
 
 ![](capture.gif)
+
+## Hardware/Software
+- NVIDIA RTX 2080
+- AMD Ryzen 3800X
+
+- Python 3.8
+- Tensorflow 2.2.0
+- Numpy 1.18.5
+- Pandas 1.2.3
 
 ## Download YOLOv3/v4 weights
 yolov3
@@ -85,7 +94,7 @@ Once XML files have been created run **XML_to_YOLOv3.py** in tools directory
 - Test images saved in mAP-master/input/images-optional 
 - Annotations (Pascal format) saved in mAP-master/input/ground-truth (file names to be same name as image / file) 
 - Run 'get_detection_results.py' to create detections files 
-- Select IOU threshold in **main.py** - default set to 0.1
+- Select IOU threshold in **main.py** - default set to 0.5
 - Set CWD to ./mAP-master and run **main.py**
 
 ## Set up config file
