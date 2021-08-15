@@ -103,14 +103,16 @@ Once XML files have been created run **XML_to_YOLOv3.py** in tools directory
 ## Set up config file
 ### When running two step:
 - TRAIN_MODEL_NAME is set to windscreen detector and TRAIN_MODEL_NAME2 is set to phone detector
-
-### For single step
 - YOLO_INPUT_SIZE and YOLO_INPUT_SIZE2 should be set accordingly
 - Ensure class_names.txt class set to **Vehicle ID:** amd class_names2.txt set to **Phone** located in **/model_data** director
 
+### For single step
+- Set TRAIN_MODEL_NAME and YOLO_INPUT_SIZE required
+- Ensure class_names.txt lists Phone and PLate classes
+
 ## Run model with object tracking
 - For one_step - run **tracker_one_step.py**
-- For two_step - run **tracker_two_step**
+- For two_step - run **tracker_two_step.py**
 
 When ran for the first time the script will create a a new directory - **detections** as well as a subdirectory with today's date to store images, and **summary** subdirectory to store and update the CSV file.
 To automatically take and save snapshots of the detections, set **take_snapshot** argument to True
