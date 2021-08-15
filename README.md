@@ -1,5 +1,7 @@
 # Identification of Driver Phone Usage Violations using YOLOv4, YOLOv3 and DeepSort.
 
+In this work, we propose a fully-automated system that will take live video feed from roadside surveillance cameras and detect if a driver is using a mobile phone whilst the vehicle is in operation. Different quality cameras (high-end, low-end) have been used for the study, whilst addressing challenges such as windscreen glare, tinted windows and low-light scenarios. The system is fully automated, it will take a screenshot of the violations, log each unique violation, and count vehicles. This information will be fully accessable via a Power BI dashboard.
+
 ## Two different approaches:
 1. One-step: Single model that detects both licence plate and phone usage.
 2. Two-step: Two models running simultaneously. First model to detect windscreen. Second model to use cropped image to find the phone villation.
@@ -13,9 +15,12 @@ DeepSort used to keep count of nuymber of phone violations and vehicles.
 - AMD Ryzen 3800X
 
 - Python 3.8
+- CUDA 10.1
+- cuDNN 7
 - Tensorflow 2.2.0
 - Numpy 1.18.5
 - Pandas 1.2.3
+- Opencv 4.5.1
 
 ## Download YOLOv3/v4 weights
 yolov3
