@@ -98,7 +98,7 @@ Once XML files have been created run **XML_to_YOLOv3.py** in tools directory
 - Set CWD to ./mAP-master and run **main.py**
 
 ## Set up config file
-#When running two step:
+# When running two step:
 - TRAIN_MODEL_NAME is set to windscreen detector and TRAIN_MODEL_NAME2 is set to phone detector
 - YOLO_INPUT_SIZE and YOLO_INPUT_SIZE2 should be set accordingly
 - Ensure class_names.txt class set to **Vehicle ID:** amd class_names2.txt set to **Phone** located in **/model_data** director
