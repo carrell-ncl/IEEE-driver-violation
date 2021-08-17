@@ -114,6 +114,7 @@ Average precision on custom dataset using two-step approach:
 | YOLOv3 416      | 58.44 | 79.99 | 25.96 |
 | YOLOv4 320      | 52.65 | 81.93 | 26.05 |
 | YOLOv3 320      | 59.05 | 84.62 | 28.97 |
+
 Results of the trained models for average precision with IOU>50 and IOU>10. Frames per second based on detection only. 
 
 
