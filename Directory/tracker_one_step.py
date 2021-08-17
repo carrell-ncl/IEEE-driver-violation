@@ -240,6 +240,6 @@ def Object_tracking(Yolo, video_path, output_path, input_size=YOLO_INPUT_SIZE, s
 
 
 
-Object_tracking(yolo, video_path, "detection2.mp4", input_size=YOLO_INPUT_SIZE, show=True, iou_threshold=0.1, rectangle_colors=(255,0,0), Track_only = [])
+Object_tracking(yolo, video_path2, "detection2.mp4", input_size=YOLO_INPUT_SIZE, show=True, iou_threshold=0.1, rectangle_colors=(255,0,0), Track_only = [])
 
 

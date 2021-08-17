@@ -11,6 +11,8 @@ Created on Wed Jul 21 13:38:22 2021
 import os
 os.environ['CUDA_VISIBLE_DEVICES'] = '0'
 import cv2
+
+# 7 in v1.10.0
 import numpy as np
 import tensorflow as tf
 from yolov3.utils import Load_Yolo_model,Load_Yolo_model2, image_preprocess, postprocess_boxes, nms, draw_bbox, read_class_names
@@ -33,7 +35,7 @@ config = tf.config.experimental.set_memory_growth(physical_devices[0], True)
 yolo = Load_Yolo_model() #Loads windscreen detector
 yolo2 = Load_Yolo_model2() #Loads phone detector
 
-video_path = "./IMAGES/drive13.mp4"
+video_path = "./IMAGES/drive17.mp4"
 video_path2 = 'IMAGES/june_8_1.mp4'
 csv_path = './detections/summary/tester.csv' #Set path for master CSV
             
@@ -184,14 +186,15 @@ def Object_tracking(Yolo, Yolo2, video_path, output_path, input_size=YOLO_INPUT_
         else:
             os.mkdir('./detections/summary')
 
+# =============================================================================
+# Starts the second step: Takes cropped windscreen image as input for the second model to detect the phone
+# =============================================================================
         for detection in tracked_bboxes:
             #print(detection[-2])
             try:
                 
                 obj_id = detection[4]
                 #print(obj_id)
-                
-                
                 output = list(detection[:4])
                 output = [int(x) for x in output]
                 cropped = original_frame[output[1]:output[3], output[0]:output[2]]
@@ -210,7 +213,7 @@ def Object_tracking(Yolo, Yolo2, video_path, output_path, input_size=YOLO_INPUT_
                 bboxes2 = nms(bboxes2, iou_threshold, method='nms')
                 image2 = draw_bbox(original_image2, bboxes2, CLASSES=CLASSES2, rectangle_colors=rectangle_colors)
                 
-                
+                #Used to count number of vehicles between phone detections and total number of vehicles (in the list)
                 if obj_id not in ID_list_vehicle_count:
 
                     temp_vehicle_counter += 1
@@ -246,11 +249,7 @@ def Object_tracking(Yolo, Yolo2, video_path, output_path, input_size=YOLO_INPUT_
                              "Phone Detections":[1], "Vehicle Detections":[temp_vehicle_counter]}) 
                             master_csv.to_csv('./detections/summary/tester.csv', encoding='utf-8', index=False)
                     
-
-
                     
-                    #temp_vehicle_counter = 0 #Clears the vehicle count once phone violation detected
-                     
                 # Puts a red bounding box around windscreen where there is a violation
                 if len(bboxes2) >0:
                     frame_counter1 = 10
@@ -268,16 +267,14 @@ def Object_tracking(Yolo, Yolo2, video_path, output_path, input_size=YOLO_INPUT_
             except:
                 break
       
-            vehicle_count = len(list(set(ID_list_vehicle_count)))
+            vehicle_count = len(list(set(ID_list_vehicle_count))) #Unique ID represnets each vehicle. Used for keeping total
             #print(ID_list)
                                                                                                                                                                                                                                                                 
             #Displays phone violation for n number of frames to avoid flashing
             if frame_counter1>0:
                 image = cv2.putText(image, f'PHONE VIOLATION VEHICLE ID {obj_id}!', (1400, 30), cv2.FONT_HERSHEY_COMPLEX_SMALL, 1, (0, 0, 255), 2)
                 frame_counter1-=1
-
-
-                
+     
         t4 = time.time()
         times3.append(t4-t1)
 
@@ -290,17 +287,18 @@ def Object_tracking(Yolo, Yolo2, video_path, output_path, input_size=YOLO_INPUT_
        
         fps_full = 1/(sum(times3)/len(times3)) #Calculate for detection + tracking + two step
         
+        #Displays FPS for detection only on the image
         image = cv2.putText(image, "Det only FPS: {:.2f}".format( 1/(sum(times[-20:])/len(times[-20:]))), (0, 30), cv2.FONT_HERSHEY_COMPLEX_SMALL, 1, (0, 0, 255), 2)
+        #Displays FPS for detection + tracking + two=step
         image = cv2.putText(image, "FPS: {:.2f}".format(1/(sum(times3[-20:])/len(times3[-20:]))), (400, 30), cv2.FONT_HERSHEY_COMPLEX_SMALL, 1, (0, 0, 255), 2)
-        
-        
+
         
         #Add date and time to the image
         now = datetime.now()
         time_str = now.strftime("%d/%m/%Y %H:%M:%S")
         image = cv2.putText(image, time_str, (800, 30), cv2.FONT_HERSHEY_COMPLEX_SMALL, 1, (0, 0, 255), 2)
         
-       
+       #Saves output video
         if output_path != '': out.write(image)
         if show:
             cv2.imshow('output', image)
@@ -324,7 +322,3 @@ def Object_tracking(Yolo, Yolo2, video_path, output_path, input_size=YOLO_INPUT_
 
 Object_tracking(yolo, yolo2,  video_path, "detection2.mp4", show=True, iou_threshold=0.1,  Track_only = [], take_snapshots=True)
 
-
-
-l=[1,2,3,4,5,6,7,8,9]
-l[-3:]

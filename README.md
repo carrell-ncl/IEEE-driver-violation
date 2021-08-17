@@ -6,7 +6,7 @@ In this work, we propose a fully-automated system that will take live video feed
 1. One-step: Single model that detects both licence plate and phone usage.
 2. Two-step: Two models running simultaneously. First model to detect windscreen. Second model to use cropped image to find the phone villation.
 
-DeepSort used to keep count of nuymber of phone violations and vehicles.
+DeepSort used to keep count of number of phone violations and vehicles.
 
 ![](capture.gif)
 
@@ -104,6 +104,16 @@ Once XML files have been created run **XML_to_YOLOv3.py** in tools directory
 - Run 'get_detection_results.py' to create detections files 
 - Select IOU threshold in **main.py** - default set to 0.5
 - Set CWD to ./mAP-master and run **main.py**
+
+Average precision on custom dataset using two-step approach:
+| Object Detector | AP50    | AP10    | FPS (detection only |
+|-----------------|---------|---------|---------------------|
+| YOLOv4 512      | 59.62   | 83.32   | 27.12               |
+| YOLOv3 512      | 63.27   | 85.88   | 25.18               |
+| YOLOv4 416      | 48.23   | 87.58   | 26.12               |
+| YOLOv3 416      | 58.44   | 79.99   | 25.96               |
+| YOLOv4 320      | 52.65   | 81.93   | 26.05               |
+| YOLOv3 320      | 59.05   | 84.62   | 28.97               |
 
 ## Set up config file
 ### When running two step:
