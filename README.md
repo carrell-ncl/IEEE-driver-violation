@@ -106,14 +106,14 @@ Once XML files have been created run **XML_to_YOLOv3.py** in tools directory
 - Set CWD to ./mAP-master and run **main.py**
 
 Average precision on custom dataset using two-step approach:
-| Object Detector | AP50  | AP10  | FPS (detection only |
-|-----------------|-------|-------|---------------------|
-| YOLOv4 512      | 59.62 | 83.32 | 27.12               |
-| YOLOv3 512      | 63.27 | 85.88 | 25.18               |
-| YOLOv4 416      | 48.23 | 87.58 | 26.12               |
-| YOLOv3 416      | 58.44 | 79.99 | 25.96               |
-| YOLOv4 320      | 52.65 | 81.93 | 26.05               |
-| YOLOv3 320      | 59.05 | 84.62 | 28.97               |
+| Object Detector | AP50  | AP10  | FPS   |
+|-----------------|-------|-------|-------|
+| YOLOv4 512      | 59.62 | 83.32 | 27.12 |
+| YOLOv3 512      | 63.27 | 85.88 | 25.18 |
+| YOLOv4 416      | 48.23 | 87.58 | 26.12 |
+| YOLOv3 416      | 58.44 | 79.99 | 25.96 |
+| YOLOv4 320      | 52.65 | 81.93 | 26.05 |
+| YOLOv3 320      | 59.05 | 84.62 | 28.97 |
 Results of the trained models for average precision with IOU>50 and IOU>10. Frames per second based on detection only. 
 
 
