@@ -18,7 +18,7 @@ YOLO_IOU_LOSS_THRESH        = 0.5
 YOLO_ANCHOR_PER_SCALE       = 3
 YOLO_MAX_BBOX_PER_SCALE     = 100
 YOLO_INPUT_SIZE             = 320
-YOLO_INPUT_SIZE2            = 416
+YOLO_INPUT_SIZE2            = 512
 if YOLO_TYPE                == "yolov4":
     YOLO_ANCHORS            = [[[12,  16], [19,   36], [40,   28]],
                                [[36,  75], [76,   55], [72,  146]],
@@ -38,7 +38,7 @@ TRAIN_ANNOT_PATH            = "model_data/dataset_train.txt"
 TRAIN_LOGDIR                = "log"
 TRAIN_CHECKPOINTS_FOLDER    = "checkpoints"
 TRAIN_MODEL_NAME            = f"{YOLO_TYPE}_custom_windscreen2_320"
-TRAIN_MODEL_NAME2            = f"{YOLO_TYPE}_custom_PP7_416"  #Uncomment if detecting windscreens first. (This should be the phone detector)
+TRAIN_MODEL_NAME2            = f"{YOLO_TYPE}_custom_PP7_512"  #Uncomment if detecting windscreens first. (This should be the phone detector)
 TRAIN_LOAD_IMAGES_TO_RAM    = True # With True faster training, but need more RAM
 TRAIN_BATCH_SIZE            = 2
 TRAIN_INPUT_SIZE            = 320

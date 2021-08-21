@@ -1,11 +1,12 @@
 .DS_Store
 *.mp4
 *.pyc
+*.pb
+*.weights
 Directory/.gitignore.txt
 Directory/checkpoints
 Directory/IMAGES
 Directory/log
-Directory/model_data
 Directory/mAP
 Directory/yolov3/__pycache__
 Directory/OIDv4_ToolKit-master/OID
