@@ -28,7 +28,7 @@ yolo = Load_Yolo_model()
 
 video_path = "./IMAGES/drive15.mp4"
 video_path2 = 'IMAGES/june_8_1.mp4'
-csv_path = './detections/summary/tester.csv' #Steven - set path for master CSV
+csv_path = './detections/summary/detection_summary.csv' #Steven - set path for master CSV
 
 def Object_tracking(Yolo, video_path, output_path, input_size=YOLO_INPUT_SIZE, show=False, CLASSES=TRAIN_CLASSES, score_threshold=0.3, iou_threshold=0.45, rectangle_colors='', Track_only = []):
     # Definition of the parameters
@@ -201,15 +201,15 @@ def Object_tracking(Yolo, video_path, output_path, input_size=YOLO_INPUT_SIZE, s
                         day_df = pd.DataFrame({"Date   ":[current_day], "Time":[current_time], "Time Stamp":[time.time()], 
                          "Phone Detections":[phone_det_counter], "Vehicle Detections":[plate_det_counter]}) 
                         
-                        master_csv = pd.read_csv('./detections/summary/tester.csv')
+                        master_csv = pd.read_csv('./detections/summary/detection_summary.csv')
                         master_csv = master_csv.append(day_df)
-                        master_csv.to_csv('./detections/summary/tester.csv', encoding='utf-8', index=False)
+                        master_csv.to_csv('./detections/summary/detection_summary.csv', encoding='utf-8', index=False)
                     else:         
                         print(plate_det_counter)
                         #os.mkdir('./detections/summary/')
                         master_csv = pd.DataFrame({"Date   ":[current_day], "Time":[current_time], "Time Stamp":[time.time()], 
                          "Phone Detections":[phone_det_counter], "Vehicle Detections":[plate_det_counter]}) 
-                        master_csv.to_csv('./detections/summary/tester.csv', encoding='utf-8', index=False)
+                        master_csv.to_csv('./detections/summary/detection_summary.csv', encoding='utf-8', index=False)
                     plate_det_counter = 0 #Resets plate counter to 0 
                     phone_det_counter = 0 #Resets phone counter to 0 
                     

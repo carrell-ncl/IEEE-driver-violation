@@ -786,7 +786,8 @@ def detect_image2(Yolo, Yolo2, image_path, output_path, input_size=416, show=Fal
         output = [int(x) for x in output]
         
         im = cv2.imread(image_path)
-        cropped = im[output[1]:output[3], output[0]:output[2]]
+        xmax2 = int(((output[2]-output[0])*0.6)+output[0]) #Crop only driver side of windscreen
+        cropped = im[output[1]:output[3], output[0]:xmax2]
         cropped      = cv2.cvtColor(cropped, cv2.COLOR_BGR2RGB)
         #cropped      = cv2.cvtColor(cropped, cv2.COLOR_BGR2RGB)
         
@@ -809,15 +810,13 @@ def detect_image2(Yolo, Yolo2, image_path, output_path, input_size=416, show=Fal
             image = cv2.rectangle(original_image, tuple(new_coors[:2]), tuple(new_coors[2:]), (0,0,255), 1)
         image2 = draw_bbox(original_image2, bboxes2, CLASSES=CLASSES, rectangle_colors=rectangle_colors)
         print(original_image2.shape)
-# =============================================================================
-#         if show:
-#             # Show the image
-#             cv2.imshow("predicted image2", image2)
-#             # Load and hold the image
-#             cv2.waitKey(0)
-#             # To close the window after the required kill value was provided
-#             cv2.destroyAllWindows()
-# =============================================================================
+        if show:
+            # Show the image
+            cv2.imshow("predicted image2", image2)
+            # Load and hold the image
+            cv2.waitKey(0)
+            # To close the window after the required kill value was provided
+            cv2.destroyAllWindows()
     
     image = draw_bbox(original_image, bboxes, CLASSES=CLASSES, rectangle_colors=rectangle_colors)
     # CreateXMLfile("XML_Detections", str(int(time.time())), original_image, bboxes, read_class_names(CLASSES))
@@ -831,4 +830,4 @@ def detect_image2(Yolo, Yolo2, image_path, output_path, input_size=416, show=Fal
         # To close the window after the required kill value was provided
         cv2.destroyAllWindows()
         
-    return image
+    

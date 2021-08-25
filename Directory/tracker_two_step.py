@@ -12,7 +12,7 @@ import os
 os.environ['CUDA_VISIBLE_DEVICES'] = '0'
 import cv2
 
-# 7 in v1.10.0
+
 import numpy as np
 import tensorflow as tf
 from yolov3.utils import Load_Yolo_model,Load_Yolo_model2, image_preprocess, postprocess_boxes, nms, draw_bbox, read_class_names
@@ -35,9 +35,9 @@ config = tf.config.experimental.set_memory_growth(physical_devices[0], True)
 yolo = Load_Yolo_model() #Loads windscreen detector
 yolo2 = Load_Yolo_model2() #Loads phone detector
 
-video_path = "./IMAGES/drive17.mp4"
+video_path = "./IMAGES/drive16.mp4"
 video_path2 = 'IMAGES/june_8_1.mp4'
-csv_path = './detections/summary/tester.csv' #Set path for master CSV
+csv_path = './detections/summary/detection_summary.csv' #Set path for master CSV
             
 def Object_tracking(Yolo, Yolo2, video_path, output_path, input_size=YOLO_INPUT_SIZE, input_size2=YOLO_INPUT_SIZE2, show=False, CLASSES=TRAIN_CLASSES, CLASSES2=TRAIN_CLASSES2, 
                     score_threshold_screen=0.3, score_threshold_phone=0.6, iou_threshold=0.45, Track_only = [], take_snapshots = True):
@@ -197,7 +197,8 @@ def Object_tracking(Yolo, Yolo2, video_path, output_path, input_size=YOLO_INPUT_
                 #print(obj_id)
                 output = list(detection[:4])
                 output = [int(x) for x in output]
-                cropped = original_frame[output[1]:output[3], output[0]:output[2]]
+                xmax2 = int(((output[2]-output[0])*0.6)+output[0]) #Crop out only driver side of the windscreen
+                cropped = original_frame[output[1]:output[3], output[0]:xmax2]
                 cropped      = cv2.cvtColor(cropped, cv2.COLOR_BGR2RGB)
                 #cropped      = cv2.cvtColor(cropped, cv2.COLOR_BGR2RGB)
                 
@@ -238,16 +239,16 @@ def Object_tracking(Yolo, Yolo2, video_path, output_path, input_size=YOLO_INPUT_
     
                             day_df = pd.DataFrame({"Date   ":[current_day], "Time":[current_time], "Time Stamp":[time.time()],
                              "Phone Detections":[1], "Vehicle Detections":[temp_vehicle_counter]}) 
-                            master_csv = pd.read_csv('./detections/summary/tester.csv')
+                            master_csv = pd.read_csv('./detections/summary/detection_summary.csv')
                         
                             master_csv = master_csv.append(day_df)
-                            master_csv.to_csv('./detections/summary/tester.csv', encoding='utf-8', index=False)
+                            master_csv.to_csv('./detections/summary/detection_summarycsv', encoding='utf-8', index=False)
                         else:
                 
                             #os.mkdir('./detections/summary/')
                             master_csv = pd.DataFrame({"Date   ":[current_day], "Time":[current_time], "Time Stamp":[time.time()],
                              "Phone Detections":[1], "Vehicle Detections":[temp_vehicle_counter]}) 
-                            master_csv.to_csv('./detections/summary/tester.csv', encoding='utf-8', index=False)
+                            master_csv.to_csv('./detections/summary/detection_summary.csv', encoding='utf-8', index=False)
                     
                     
                 # Puts a red bounding box around windscreen where there is a violation

@@ -4,7 +4,7 @@ In this work, we propose a fully-automated system that will take live video feed
 
 ## Two different approaches:
 1. One-step: Single model that detects both licence plate and phone usage.
-2. Two-step: Two models running simultaneously. First model to detect windscreen. Second model to use cropped image to find the phone villation.
+2. Two-step: Two models running simultaneously. First model to detect windscreen. Second model to use cropped image of driver's side to find the phone villation.
 
 DeepSort used to keep count of number of phone violations and vehicles.
 

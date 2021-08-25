@@ -1,13 +1,6 @@
 #================================================================
-#
-#   File name   : train.py
-#   Author      : PyLessons
-#   Created date: 2020-08-06
-#   Website     : https://pylessons.com/
-#   GitHub      : https://github.com/pythonlessons/TensorFlow-2.x-YOLOv3
-#   Description : used to train custom object detector
-#
-#================================================================
+#Based on https://github.com/pythonlessons/TensorFlow-2.x-YOLOv3
+#============================================================
 import os
 os.environ['CUDA_VISIBLE_DEVICES'] = '0'
 os.environ['TF_FORCE_GPU_ALLOW_GROWTH'] = 'true'
